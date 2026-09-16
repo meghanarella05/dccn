@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DCN Numericals Drill — Modules 1 & 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#E7EDE9; --grid:#CFDCD5; --card:#F4F8F5;
+  --ink:#16302A; --pencil:#5C7068; --faint:#8A9A93;
+  --red:#A82A1E; --blue:#1B4F8A; --amber:#8A6100;
+  --rule:#BFCFC7; --shadowc:rgba(22,48,42,.10);
+  --sans:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0E1614; --grid:#1A2623; --card:#141F1C;
+    --ink:#DCE7E2; --pencil:#8FA49C; --faint:#6B7F78;
+    --red:#E8796B; --blue:#7FB2E5; --amber:#D9A94A;
+    --rule:#26332F; --shadowc:rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0E1614; --grid:#1A2623; --card:#141F1C;
+  --ink:#DCE7E2; --pencil:#8FA49C; --faint:#6B7F78;
+  --red:#E8796B; --blue:#7FB2E5; --amber:#D9A94A;
+  --rule:#26332F; --shadowc:rgba(0,0,0,.4);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size:26px 26px;
+  color:var(--ink); font-family:var(--sans);
+  font-size:16px; line-height:1.55;
+  -webkit-text-size-adjust:100%;
+}
+.wrap{max-width:860px;margin:0 auto;padding:20px 16px 120px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 16px;margin-bottom:6px}
+h1{font-size:23px;font-weight:700;letter-spacing:-.02em;margin:0}
+.sub{color:var(--pencil);font-size:13.5px;margin:0}
+.tabs{display:flex;gap:2px;margin:16px 0 14px;border-bottom:2px solid var(--rule)}
+.tab{appearance:none;background:none;border:0;border-bottom:2px solid transparent;margin-bottom:-2px;
+  font:600 14.5px var(--sans);color:var(--pencil);padding:8px 13px;cursor:pointer}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+.tab:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.chip{appearance:none;font:500 12.5px var(--sans);padding:5px 11px;border-radius:999px;cursor:pointer;
+  border:1px solid var(--rule);background:transparent;color:var(--pencil)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+.card{background:var(--card);border:1px solid var(--rule);border-radius:3px;
+  box-shadow:0 1px 0 var(--shadowc);padding:20px 20px 22px;margin-bottom:16px}
+.meta{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;
+  font:500 12px var(--sans);color:var(--faint);margin-bottom:12px}
+.meta .name{color:var(--blue);font-weight:600;font-size:12.5px}
+.q{font-size:17.5px;line-height:1.6;margin:0 0 4px}
+.q code,.q b code{font-family:var(--mono);font-size:.95em;background:transparent}
+
+.stepbox{margin-top:20px;padding-top:16px;border-top:1px dashed var(--rule)}
+.lbl{font:600 12px var(--sans);color:var(--faint);margin:0 0 9px}
+ol.steps{margin:0;padding-left:0;list-style:none;counter-reset:s}
+ol.steps li{counter-increment:s;position:relative;padding:5px 0 5px 32px;font-size:15.3px;line-height:1.6}
+ol.steps li::before{content:counter(s);position:absolute;left:0;top:6px;width:21px;height:21px;
+  border:1px solid var(--rule);border-radius:50%;font:500 11.5px var(--mono);color:var(--pencil);
+  display:flex;align-items:center;justify-content:center}
+.final{margin-top:14px;padding:11px 14px;border-left:3px solid var(--blue);background:var(--paper);
+  font-family:var(--mono);font-size:14.5px;color:var(--blue)}
+pre.ld{font-family:var(--mono);font-size:13px;line-height:1.45;background:var(--paper);
+  border:1px solid var(--rule);padding:12px;overflow-x:auto;margin:9px 0;color:var(--ink)}
+
+.wave{margin:14px 0 4px;overflow-x:auto}
+.wave svg{display:block;min-width:340px}
+
+.watch{margin-top:18px;padding-left:14px;border-left:3px solid var(--red)}
+.watch p.lbl{color:var(--red)}
+.watch ul{margin:0;padding-left:18px}
+.watch li{font-size:14.5px;line-height:1.55;margin-bottom:5px;color:var(--ink)}
+
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--rule);
+  padding:11px 16px;display:flex;gap:9px;justify-content:center;flex-wrap:wrap;z-index:20}
+.btn{appearance:none;font:600 14.5px var(--sans);padding:11px 18px;border-radius:3px;cursor:pointer;
+  border:1px solid var(--ink);background:var(--ink);color:var(--paper)}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.good{border-color:var(--blue);color:var(--blue);background:transparent}
+.btn.bad{border-color:var(--red);color:var(--red);background:transparent}
+.btn:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.btn kbd{font:500 11px var(--mono);opacity:.6;margin-left:6px}
+
+.stats{display:flex;gap:20px;flex-wrap:wrap;font:500 13px var(--sans);color:var(--pencil);margin-bottom:14px}
+.stats b{font-family:var(--mono);color:var(--ink);font-weight:600}
+
+.sheet h2{font-size:15px;font-weight:700;margin:26px 0 4px;letter-spacing:-.01em}
+.sheet .topic{font:500 12px var(--sans);color:var(--faint);margin:0 0 9px}
+.sheet ol{margin:0 0 10px;padding-left:20px}
+.sheet ol li{font-size:14.8px;line-height:1.6;margin-bottom:3px}
+.weak{font-size:14px;color:var(--pencil)}
+.weak b{color:var(--red);font-family:var(--mono)}
+hr.d{border:0;border-top:1px solid var(--rule);margin:22px 0}
+a{color:var(--blue)}
+@media (max-width:520px){ .wrap{padding:14px 11px 130px} h1{font-size:20px} .q{font-size:16.5px} .card{padding:15px 14px 18px} }
+@media print{ .bar,.tabs,.chips,.stats{display:none} body{background:#fff;color:#000} .card{break-inside:avoid} }
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>DCN numericals drill</h1>
+    <p class="sub">Modules 1 &amp; 2 &middot; write it on paper, then check the steps</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="t-drill" aria-selected="true" onclick="setTab('drill')">Drill</button>
+    <button class="tab" role="tab" id="t-sheet" aria-selected="false" onclick="setTab('sheet')">Step sheet</button>
+    <button class="tab" role="tab" id="t-stats" aria-selected="false" onclick="setTab('stats')">Weak spots</button>
+  </div>
+
+  <section id="p-drill">
+    <div class="chips" id="chips"></div>
+    <div class="stats" id="quickstats"></div>
+    <div class="card" id="qcard"></div>
+  </section>
+
+  <section id="p-sheet" hidden class="sheet"></section>
+  <section id="p-stats" hidden></section>
+</div>
+
+<div class="bar" id="bar"></div>
+
+<script>
+/* ============ helpers ============ */
+const R = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const pick = (a) => a[Math.floor(Math.random() * a.length)];
+const log2 = (x) => Math.log(x) / Math.LN2;
+
+function sig(x, n) {
+  if (!isFinite(x)) return String(x);
+  if (x === 0) return '0';
+  const r = Number(x.toPrecision(n || 4));
+  return String(r);
+}
+function eng(x, unit) {
+  const a = Math.abs(x);
+  if (a >= 1e9) return sig(x / 1e9) + ' G' + unit;
+  if (a >= 1e6) return sig(x / 1e6) + ' M' + unit;
+  if (a >= 1e3) return sig(x / 1e3) + ' k' + unit;
+  if (a >= 1) return sig(x) + ' ' + unit;
+  if (a >= 1e-3) return sig(x * 1e3) + ' m' + unit;
+  if (a >= 1e-6) return sig(x * 1e6) + ' \u00b5' + unit;
+  if (a >= 1e-9) return sig(x * 1e9) + ' n' + unit;
+  return sig(x) + ' ' + unit;
+}
+function bits(n) { let s = ''; for (let i = 0; i < n; i++) s += R(0, 1); return s; }
+
+/* ============ CRC ============ */
+function crcSteps(data, gen) {
+  const n = gen.length;
+  const aug = (data + '0'.repeat(n - 1)).split('').map(Number);
+  const g = gen.split('').map(Number);
+  let rem = aug.slice(0, n);
+  let pos = n;
+  const lines = [];
+  while (true) {
+    const useG = rem[0] === 1;
+    const sub = useG ? g.slice() : new Array(n).fill(0);
+    const res = rem.map((b, i) => b ^ sub[i]);
+    lines.push({ rem: rem.join(''), sub: sub.join(''), useG: useG, res: res.join('') });
+    const next = res.slice(1);
+    if (pos < aug.length) { next.push(aug[pos]); pos++; rem = next; }
+    else { rem = next; break; }
+  }
+  return { lines: lines, remainder: rem.join('') };
+}
+
+/* ============ ones-complement checksum ============ */
+function onesSum(words, n) {
+  const mask = (1 << n) - 1;
+  let s = 0;
+  const trace = [];
+  for (const w of words) {
+    s = s + w;
+    let note = '';
+    if (s > mask) { s = (s & mask) + (s >> n); note = ' (carry wrapped)'; }
+    trace.push({ w: w, s: s, note: note });
+  }
+  return { sum: s, checksum: (~s) & mask, trace: trace };
+}
+const bin = (v, n) => v.toString(2).padStart(n, '0');
+
+/* ============ line coding waveform ============ */
+function encodeWave(scheme, b) {
+  const out = [];
+  let lvl = 1, alt = 1;
+  for (const ch of b.split('')) {
+    const bit = +ch;
+    if (scheme === 'NRZ-L') out.push(bit === 0 ? [1, 1] : [-1, -1]);
+    else if (scheme === 'NRZ-I') { if (bit === 1) lvl = -lvl; out.push([lvl, lvl]); }
+    else if (scheme === 'RZ') out.push(bit === 1 ? [1, 0] : [-1, 0]);
+    else if (scheme === 'Manchester') out.push(bit === 0 ? [1, -1] : [-1, 1]);
+    else if (scheme === 'Differential Manchester') {
+      const start = (bit === 0) ? -lvl : lvl;
+      out.push([start, -start]); lvl = -start;
+    }
+    else if (scheme === 'AMI') { if (bit === 0) out.push([0, 0]); else { out.push([alt, alt]); alt = -alt; } }
+    else if (scheme === 'Pseudoternary') { if (bit === 1) out.push([0, 0]); else { out.push([alt, alt]); alt = -alt; } }
+  }
+  return out;
+}
+
+/* ============ line coding rate table (Forouzan) ============ */
+const LC = {
+  'NRZ-L': { r: 1, c: '1/2', S: (N) => N / 2, Sx: 'N/2', B: 'N/2' },
+  'NRZ-I': { r: 1, c: '1/2', S: (N) => N / 2, Sx: 'N/2', B: 'N/2' },
+  'RZ': { r: 0.5, c: '1/2', S: (N) => N, Sx: 'N', B: 'N' },
+  'Manchester': { r: 0.5, c: '1/2', S: (N) => N, Sx: 'N', B: 'N' },
+  'Differential Manchester': { r: 0.5, c: '1/2', S: (N) => N, Sx: 'N', B: 'N' },
+  'AMI': { r: 1, c: '1/2', S: (N) => N / 2, Sx: 'N/2', B: 'N/2' },
+  '2B1Q': { r: 2, c: '1/2', S: (N) => N / 4, Sx: 'N/4', B: 'N/4' },
+  'MLT-3': { r: 1, c: '1/3', S: (N) => N / 3, Sx: 'N/3', B: 'N/3' }
+};
+
+/* ============ TYPES ============ */
+const TYPES = [];
+const T = (o) => { TYPES.push(o); };
+
+T({
+  id: 'nyq', name: 'Nyquist bit rate', mod: 1, topic: 'Data rate limits',
+  heur: [
+    'Write: <b>BitRate = 2 &times; B &times; log\u2082 L</b>  (noiseless \u2192 Nyquist)',
+    'List given: B in Hz, L = number of signal levels.',
+    'Substitute with units shown.',
+    'If solving for L: log\u2082 L = BitRate / (2B), then L = 2^that.',
+    'State answer with unit (bps / levels).'
+  ],
+  watch: ['"Noiseless / no noise" = Nyquist. If SNR appears anywhere, it is Shannon.', 'B must be in Hz, not bps.', 'L must be a power of 2 to be practical \u2014 say so if it is not.'],
+  gen: function () {
+    const mode = pick(['rate', 'levels', 'rate']);
+    if (mode === 'rate') {
+      const B = pick([3000, 4000, 6000, 8000, 20000]);
+      const L = pick([2, 4, 8, 16]);
+      const ans = 2 * B * log2(L);
+      return {
+        q: 'Consider a <b>noiseless</b> channel with a bandwidth of <b>' + eng(B, 'Hz') + '</b> transmitting a signal with <b>' + L + ' signal levels</b>. What is the maximum bit rate?',
+        steps: [
+          'Noiseless channel \u2192 use Nyquist: BitRate = 2 \u00d7 B \u00d7 log\u2082 L',
+          'B = ' + eng(B, 'Hz') + ',  L = ' + L,
+          'BitRate = 2 \u00d7 ' + B + ' \u00d7 log\u2082 ' + L + ' = 2 \u00d7 ' + B + ' \u00d7 ' + log2(L),
+          'BitRate = ' + eng(ans, 'bps')
+        ],
+        ans: eng(ans, 'bps')
+      };
+    } else {
+      const B = pick([20000, 10000, 4000, 25000]);
+      const k = pick([4, 6, 8, 10]);
+      const N = 2 * B * k;
+      const L = Math.pow(2, k);
+      return {
+        q: 'We need to send <b>' + eng(N, 'bps') + '</b> over a noiseless channel with a bandwidth of <b>' + eng(B, 'Hz') + '</b>. How many signal levels do we need?',
+        steps: [
+          'Noiseless \u2192 Nyquist: BitRate = 2 \u00d7 B \u00d7 log\u2082 L',
+          'Rearrange: log\u2082 L = BitRate / (2 \u00d7 B)',
+          'log\u2082 L = ' + N + ' / (2 \u00d7 ' + B + ') = ' + k,
+          'L = 2^' + k + ' = <b>' + L + ' levels</b>',
+          'L is a power of 2, so this answer is practical.'
+        ],
+        ans: L + ' levels'
+      };
+    }
+  }
+});
+
+T({
+  id: 'shan', name: 'Shannon capacity', mod: 1, topic: 'Data rate limits',
+  heur: [
+    'Write: <b>C = B &times; log\u2082(1 + SNR)</b>',
+    'If SNR is given in dB first convert: <b>SNR = 10^(SNR<sub>dB</sub>/10)</b>.',
+    'Substitute, compute log\u2082 by log\u2082x = ln x / ln 2 (or log x / log 2).',
+    'State C in bps.',
+    'Shortcut for large SNR<sub>dB</sub>: <b>C \u2248 B &times; SNR<sub>dB</sub> / 3</b>.'
+  ],
+  watch: ['SNR is a ratio (no unit). SNR_dB is decibels. Never plug dB straight into the log.', 'Extremely noisy channel (SNR = 0) \u2192 C = 0. Say it in one line, no calculation needed.', 'Shannon gives capacity only \u2014 it never tells you the number of levels.'],
+  gen: function () {
+    const mode = pick(['db', 'ratio', 'db']);
+    if (mode === 'db') {
+      const B = pick([3100, 2000, 4000, 1000000]);
+      const d = pick([20, 30, 36, 40, 63]);
+      const snr = Math.pow(10, d / 10);
+      const C = B * log2(1 + snr);
+      return {
+        q: 'Using the Shannon theorem, calculate the maximum bit rate of a channel with bandwidth <b>' + eng(B, 'Hz') + '</b> and <b>SNR<sub>dB</sub> = ' + d + ' dB</b>.',
+        steps: [
+          'Convert dB to a ratio: SNR = 10^(SNR<sub>dB</sub>/10) = 10^(' + d + '/10) = 10^' + (d / 10) + ' = ' + sig(snr, 6),
+          'Shannon: C = B \u00d7 log\u2082(1 + SNR)',
+          'C = ' + B + ' \u00d7 log\u2082(1 + ' + sig(snr, 6) + ') = ' + B + ' \u00d7 ' + sig(log2(1 + snr), 5),
+          'C = ' + eng(C, 'bps'),
+          'Check with shortcut C \u2248 B \u00d7 SNR<sub>dB</sub>/3 = ' + eng(B * d / 3, 'bps') + ' \u2014 same ballpark \u2714'
+        ],
+        ans: eng(C, 'bps')
+      };
+    } else {
+      const B = pick([3000, 4000, 2700, 1000]);
+      const snr = pick([1, 3, 7, 15, 31, 1023, 3162]);
+      const C = B * log2(1 + snr);
+      return {
+        q: 'A channel has a bandwidth of <b>' + eng(B, 'Hz') + '</b> and <b>SNR = ' + snr + '</b>. Find the channel capacity.',
+        steps: [
+          'Noisy channel \u2192 Shannon: C = B \u00d7 log\u2082(1 + SNR)',
+          'B = ' + eng(B, 'Hz') + ',  SNR = ' + snr + ' (a ratio, no unit)',
+          'C = ' + B + ' \u00d7 log\u2082(' + (1 + snr) + ') = ' + B + ' \u00d7 ' + sig(log2(1 + snr), 5),
+          'C = ' + eng(C, 'bps')
+        ],
+        ans: eng(C, 'bps')
+      };
+    }
+  }
+});
+
+T({
+  id: 'both', name: 'Nyquist + Shannon together', mod: 1, topic: 'Data rate limits',
+  heur: [
+    'Step 1 \u2014 Shannon gives the <b>upper limit</b>: C = B &times; log\u2082(1 + SNR).',
+    'Step 2 \u2014 Choose a practical bit rate <b>below</b> C (round down to a clean number).',
+    'Step 3 \u2014 Feed that chosen rate into Nyquist to get levels: L = 2^(BitRate / 2B).',
+    'Step 4 \u2014 State both: bit rate AND number of levels.'
+  ],
+  watch: ['Always Shannon FIRST (limit), Nyquist SECOND (levels). Never the other way round.', 'Explicitly write the sentence "we choose a lower bit rate, e.g. X, to be safe" \u2014 marks are given for it.'],
+  gen: function () {
+    const B = pick([1000000, 2000000, 1000000]);
+    const d = pick([63, 36, 30]);
+    const C = B * d / 3;
+    const chosen = Math.pow(2, Math.floor(log2(C / 1e6))) * 1e6;
+    const L = Math.pow(2, chosen / (2 * B));
+    return {
+      q: 'We have a channel with <b>' + eng(B, 'Hz') + '</b> bandwidth and <b>SNR<sub>dB</sub> = ' + d + ' dB</b>. What are the appropriate bit rate and signal level?',
+      steps: [
+        'First find the upper limit with Shannon.',
+        'C \u2248 B \u00d7 SNR<sub>dB</sub>/3 = ' + B + ' \u00d7 ' + d + '/3 = ' + eng(C, 'bps'),
+        'The Shannon capacity is the ceiling. Choose a practical bit rate <b>below</b> it: ' + eng(chosen, 'bps') + '.',
+        'Now use Nyquist to find the levels: BitRate = 2 \u00d7 B \u00d7 log\u2082 L',
+        'log\u2082 L = ' + chosen + ' / (2 \u00d7 ' + B + ') = ' + (chosen / (2 * B)),
+        'L = 2^' + (chosen / (2 * B)) + ' = <b>' + L + ' levels</b>',
+        'Answer: bit rate ' + eng(chosen, 'bps') + ' with ' + L + ' signal levels.'
+      ],
+      ans: eng(chosen, 'bps') + ', ' + L + ' levels'
+    };
+  }
+});
+
+T({
+  id: 'db', name: 'Decibel / attenuation', mod: 1, topic: 'Transmission impairment',
+  heur: [
+    'Write: <b>dB = 10 log\u2081\u2080 (P\u2082 / P\u2081)</b>.',
+    'Loss \u2192 negative dB. Gain \u2192 positive dB.',
+    'Multiply dB/km by the length to get total dB.',
+    'To get power back: <b>P\u2082 = P\u2081 &times; 10^(dB/10)</b>.',
+    'For a chain of segments, <b>add the dB values</b> (that is the whole point of dB).'
+  ],
+  watch: ['Never multiply dB values \u2014 add them.', '\u22123 dB = power halved. +3 dB = power doubled. Use it as a sanity check.', 'Keep the minus sign for loss all the way to the end.'],
+  gen: function () {
+    const mode = pick(['km', 'chain']);
+    if (mode === 'km') {
+      const loss = pick([0.3, 0.2, 0.5]);
+      const km = pick([5, 10, 20]);
+      const P1 = pick([2, 1, 5]);
+      const tot = -loss * km;
+      const P2 = P1 * Math.pow(10, tot / 10);
+      return {
+        q: 'The loss in a cable is <b>\u2212' + loss + ' dB/km</b>. If the signal at the beginning of the cable has a power of <b>' + P1 + ' mW</b>, what is the power of the signal at <b>' + km + ' km</b>?',
+        steps: [
+          'Total loss = (dB per km) \u00d7 (length) = \u2212' + loss + ' \u00d7 ' + km + ' = <b>' + sig(tot) + ' dB</b>',
+          'dB = 10 log\u2081\u2080(P\u2082/P\u2081)  \u21d2  P\u2082 = P\u2081 \u00d7 10^(dB/10)',
+          'P\u2082 = ' + P1 + ' \u00d7 10^(' + sig(tot) + '/10) = ' + P1 + ' \u00d7 10^' + sig(tot / 10),
+          'P\u2082 = <b>' + sig(P2, 4) + ' mW</b>'
+        ],
+        ans: sig(P2, 4) + ' mW'
+      };
+    } else {
+      const a = -pick([3, 5, 7]), b = pick([7, 10, 12]), c = -pick([3, 4, 6]);
+      const tot = a + b + c;
+      const P1 = pick([1, 2]);
+      const P2 = P1 * Math.pow(10, tot / 10);
+      return {
+        q: 'A signal travels through three segments: a loss of <b>' + (-a) + ' dB</b>, then an amplifier with gain <b>' + b + ' dB</b>, then a loss of <b>' + (-c) + ' dB</b>. If the input power is <b>' + P1 + ' mW</b>, find the total dB and the output power.',
+        steps: [
+          'Decibels of segments in series simply <b>add</b>.',
+          'Total dB = (' + a + ') + (+' + b + ') + (' + c + ') = <b>' + (tot > 0 ? '+' : '') + tot + ' dB</b>',
+          'P\u2082 = P\u2081 \u00d7 10^(dB/10) = ' + P1 + ' \u00d7 10^(' + tot + '/10)',
+          'P\u2082 = <b>' + sig(P2, 4) + ' mW</b>'
+        ],
+        ans: (tot > 0 ? '+' : '') + tot + ' dB, ' + sig(P2, 4) + ' mW'
+      };
+    }
+  }
+});
+
+T({
+  id: 'baud', name: 'Bit rate vs baud rate', mod: 1, topic: 'Digital signals',
+  heur: [
+    'Write: <b>N = S &times; r</b>  where N = bit rate (bps), S = signal/baud rate (baud), r = bits per signal element.',
+    'And: <b>r = log\u2082 L</b>, so <b>L = 2^r</b>.',
+    'Identify which two of N, S, r are given, solve for the third.',
+    'State units properly: bps for N, <b>baud</b> for S.'
+  ],
+  watch: ['"Data element" = bit. "Signal element" = baud/symbol. Read which one they want.', 'Baud rate is never higher than bit rate for r \u2265 1.', 'If they ask "how many signal elements do we need" they mean S, not L.'],
+  gen: function () {
+    const mode = pick(['r', 'N']);
+    if (mode === 'r') {
+      const S = pick([1000, 2000, 500]);
+      const r = pick([2, 3, 4, 8]);
+      const N = S * r;
+      return {
+        q: 'An analog signal has a bit rate of <b>' + eng(N, 'bps') + '</b> and a baud rate of <b>' + S + ' baud</b>. How many data elements are carried by each signal element? How many signal elements do we need?',
+        steps: [
+          'N = S \u00d7 r  \u21d2  r = N / S',
+          'r = ' + N + ' / ' + S + ' = <b>' + r + ' bits per signal element</b>',
+          'Number of signal elements needed: L = 2^r = 2^' + r + ' = <b>' + Math.pow(2, r) + '</b>'
+        ],
+        ans: 'r = ' + r + ' bits/element, L = ' + Math.pow(2, r)
+      };
+    } else {
+      const r = pick([2, 4, 5]);
+      const S = pick([1000, 2000, 1500]);
+      return {
+        q: 'An analog signal carries <b>' + r + ' bits per signal element</b>. If <b>' + S + ' signal elements</b> are sent per second, find the bit rate.',
+        steps: [
+          'N = S \u00d7 r',
+          'N = ' + S + ' \u00d7 ' + r + ' = <b>' + eng(S * r, 'bps') + '</b>'
+        ],
+        ans: eng(S * r, 'bps')
+      };
+    }
+  }
+});
+
+T({
+  id: 'perf', name: 'Performance: delay, throughput, bit length', mod: 1, topic: 'Performance',
+  heur: [
+    '<b>Propagation time = Distance / Propagation speed</b>',
+    '<b>Transmission time = Message size / Bandwidth</b>',
+    '<b>Latency = Propagation + Transmission + Queuing + Processing</b>',
+    '<b>Bit length = Propagation speed &times; Bit duration</b>',
+    '<b>Throughput = (total bits actually delivered) / (time)</b>',
+    'Always convert to base units (m, s, bits) before dividing.'
+  ],
+  watch: ['Propagation depends on DISTANCE only. Transmission depends on SIZE only. Do not swap them.', 'Frames per minute \u2192 divide by 60 before using.', 'Default propagation speed in these problems is 2 \u00d7 10\u2078 m/s unless stated.'],
+  gen: function () {
+    const mode = pick(['prop', 'thr', 'both']);
+    if (mode === 'prop') {
+      const d = pick([12000, 5000, 3600]) * 1000;
+      const v = 2.4e8;
+      const t = d / v;
+      return {
+        q: 'What is the propagation time if the distance between two points is <b>' + (d / 1000) + ' km</b>? Assume the propagation speed in cable is <b>2.4 \u00d7 10\u2078 m/s</b>.',
+        steps: [
+          'Propagation time = Distance / Propagation speed',
+          'Convert distance to metres: ' + (d / 1000) + ' km = ' + d + ' m',
+          't = ' + d + ' / (2.4 \u00d7 10\u2078) = ' + sig(t, 4) + ' s',
+          't = <b>' + eng(t, 's') + '</b>'
+        ],
+        ans: eng(t, 's')
+      };
+    } else if (mode === 'thr') {
+      const B = pick([10, 100]) * 1e6;
+      const fr = pick([12000, 6000, 24000]);
+      const sz = pick([10000, 8000]);
+      const thr = fr * sz / 60;
+      return {
+        q: 'A network with a bandwidth of <b>' + eng(B, 'bps') + '</b> can pass only an average of <b>' + fr + ' frames per minute</b>, each frame carrying an average of <b>' + eng(sz, 'bits') + '</b>. What is the throughput of this network?',
+        steps: [
+          'Throughput = (bits delivered) / (time in seconds)',
+          'Bits in one minute = ' + fr + ' \u00d7 ' + sz + ' = ' + (fr * sz) + ' bits',
+          'One minute = 60 s, so Throughput = ' + (fr * sz) + ' / 60',
+          'Throughput = <b>' + eng(thr, 'bps') + '</b>',
+          'Note: throughput (' + eng(thr, 'bps') + ') < bandwidth (' + eng(B, 'bps') + '), as expected.'
+        ],
+        ans: eng(thr, 'bps')
+      };
+    } else {
+      const B = pick([1e6, 1e5]);
+      const v = 2e8;
+      const bd = 1 / B;
+      const bl = v * bd;
+      return {
+        q: 'What is the bit length of a link with bandwidth <b>' + eng(B, 'bps') + '</b> if the propagation speed is <b>2 \u00d7 10\u2078 m/s</b>?',
+        steps: [
+          'Bit duration = 1 / bandwidth = 1 / ' + B + ' = ' + eng(bd, 's'),
+          'Bit length = Propagation speed \u00d7 Bit duration',
+          'Bit length = (2 \u00d7 10\u2078) \u00d7 ' + sig(bd, 4) + ' = <b>' + eng(bl, 'm') + '</b>'
+        ],
+        ans: eng(bl, 'm')
+      };
+    }
+  }
+});
+
+T({
+  id: 'lcrate', name: 'Line coding: signal rate & bandwidth', mod: 1, topic: 'Line coding',
+  heur: [
+    'Write: <b>S = c &times; N &times; (1/r)</b>  \u2014 S = signal rate (baud), c = case factor, N = data rate, r = data elements per signal element.',
+    'Look up r for the scheme (NRZ = 1, Manchester = 1/2, 2B1Q = 2, MLT-3 = 1).',
+    'Use c = 1/2 for the average case (c = 1/3 for MLT-3).',
+    'B<sub>min</sub> = S<sub>ave</sub>.',
+    'State the answer in baud and Hz.'
+  ],
+  watch: ['Manchester r = 1/2 (one bit uses TWO signal elements) \u2014 so its rate is DOUBLE NRZ. That is its main disadvantage.', 'Do not confuse N (bps) with S (baud).', 'The question often says "average" \u2014 that is what c = 1/2 is for.'],
+  gen: function () {
+    const sch = pick(Object.keys(LC));
+    const N = pick([1e6, 2e6, 100000, 10e6]);
+    const o = LC[sch];
+    const S = o.S(N);
+    return {
+      q: 'A signal is carrying data using the <b>' + sch + '</b> scheme with a data rate of <b>' + eng(N, 'bps') + '</b>. Find the average signal rate and the minimum bandwidth.',
+      steps: [
+        'Formula: S = c \u00d7 N \u00d7 (1/r)',
+        'For ' + sch + ': r = ' + (o.r === 0.5 ? '1/2' : o.r) + ',  c = ' + o.c + ' (average case)',
+        'S = ' + o.c + ' \u00d7 ' + N + ' \u00d7 (1/' + (o.r === 0.5 ? '(1/2)' : o.r) + ') = ' + o.Sx + ' = <b>' + eng(S, 'baud') + '</b>',
+        'Minimum bandwidth B<sub>min</sub> = S<sub>ave</sub> = <b>' + eng(S, 'Hz') + '</b>'
+      ],
+      ans: eng(S, 'baud') + ', B = ' + eng(S, 'Hz')
+    };
+  }
+});
+
+T({
+  id: 'wave', name: 'Draw the line code', mod: 1, topic: 'Line coding',
+  heur: [
+    'Draw the bit boundaries first as light vertical lines, and label the bits on top.',
+    'Apply the one rule for that scheme to every bit in order.',
+    'NRZ-L: 0 = high, 1 = low (level only, no transitions).',
+    'NRZ-I: 1 = invert at the START of the bit, 0 = no change.',
+    'RZ: 1 = high then back to zero mid-bit, 0 = low then back to zero.',
+    'Manchester: ALWAYS a mid-bit transition. 0 = high\u2192low, 1 = low\u2192high.',
+    'Diff. Manchester: ALWAYS a mid-bit transition. 0 = there IS a transition at the start, 1 = no transition at start.',
+    'AMI: 0 = zero level, 1 = alternate +/\u2212 starting with +.',
+    'Pseudoternary: the opposite \u2014 1 = zero level, 0 = alternate +/\u2212.'
+  ],
+  watch: ['Forouzan\u2019s NRZ-L is 0 = positive, 1 = negative. Write your assumed convention on the sheet before drawing.', 'Manchester and Diff. Manchester NEVER skip the mid-bit transition, even for a run of the same bit.', 'For NRZ-I and Diff. Manchester, state your starting level \u2014 you get marks for stating the assumption.'],
+  gen: function () {
+    const sch = pick(['NRZ-L', 'NRZ-I', 'RZ', 'Manchester', 'Differential Manchester', 'AMI', 'Pseudoternary']);
+    const b = pick(['10110011', '101011100', '01001110', '11100011', '10010110']);
+    return {
+      q: 'Represent the bit sequence <b><code>' + b + '</code></b> using the <b>' + sch + '</b> encoding scheme.',
+      wave: { scheme: sch, bits: b },
+      steps: [
+        'Scheme: ' + sch + '. Mark the ' + b.length + ' bit intervals first.',
+        RULE[sch],
+        'Apply the rule bit by bit, left to right. The waveform is drawn below.'
+      ],
+      ans: 'see waveform'
+    };
+  }
+});
+const RULE = {
+  'NRZ-L': 'Rule: level carries the value \u2014 0 = positive (high), 1 = negative (low). No mid-bit transitions at all.',
+  'NRZ-I': 'Rule: 1 = invert the level at the start of the bit; 0 = keep the level. Start assumed at the positive level.',
+  'RZ': 'Rule: three levels. 1 = positive for the first half then zero; 0 = negative for the first half then zero.',
+  'Manchester': 'Rule: always a transition in the middle. 0 = high\u2192low, 1 = low\u2192high.',
+  'Differential Manchester': 'Rule: always a transition in the middle. 0 = also a transition at the START of the bit; 1 = no transition at the start. Start assumed at the positive level.',
+  'AMI': 'Rule: 0 = zero level. 1 = alternating positive and negative, first 1 taken as positive.',
+  'Pseudoternary': 'Rule: 1 = zero level. 0 = alternating positive and negative, first 0 taken as positive.'
+};
+
+T({
+  id: 'pcm', name: 'PCM / sampling', mod: 2, topic: 'Analog to digital',
+  heur: [
+    '<b>f<sub>s</sub> = 2 &times; f<sub>max</sub></b>  (Nyquist sampling rate; for a low-pass signal f<sub>max</sub> = bandwidth).',
+    '<b>n<sub>b</sub> = log\u2082 L</b>  bits per sample.',
+    '<b>Bit rate = f<sub>s</sub> &times; n<sub>b</sub></b>.',
+    '<b>B<sub>min</sub> of the digital signal = n<sub>b</sub> &times; B<sub>analog</sub></b> (= bit rate / 2).',
+    'SNR<sub>dB</sub> = 6.02 n<sub>b</sub> + 1.76 if they ask for quantization SNR.'
+  ],
+  watch: ['Sampling rate is 2\u00d7 the HIGHEST frequency, not the bandwidth, unless the signal is low-pass (starts at 0).', 'Levels L \u2192 bits is a log\u2082, not a divide.', 'Answer in samples/second (Hz) for fs, bps for bit rate \u2014 do not mix.'],
+  gen: function () {
+    const mode = pick(['full', 'fs']);
+    if (mode === 'fs') {
+      const B = pick([200, 100, 500]) * 1000;
+      return {
+        q: 'A complex low-pass signal has a bandwidth of <b>' + eng(B, 'Hz') + '</b>. What is the minimum sampling rate for this signal?',
+        steps: [
+          'For a low-pass signal the lowest frequency is 0, so f<sub>max</sub> = bandwidth = ' + eng(B, 'Hz'),
+          'Nyquist sampling theorem: f<sub>s</sub> = 2 \u00d7 f<sub>max</sub>',
+          'f<sub>s</sub> = 2 \u00d7 ' + B + ' = <b>' + eng(2 * B, 'samples/s') + '</b>'
+        ],
+        ans: eng(2 * B, 'samples/s')
+      };
+    }
+    const f = pick([4000, 3400, 20000]);
+    const L = pick([64, 128, 256, 1024]);
+    const nb = log2(L);
+    const fs = 2 * f;
+    const br = fs * nb;
+    return {
+      q: 'We want to digitize the human voice with a highest frequency of <b>' + eng(f, 'Hz') + '</b> using <b>' + L + ' quantization levels</b>. Find the sampling rate, the bits per sample, the bit rate, and the minimum bandwidth of the digital signal.',
+      steps: [
+        'Sampling rate: f<sub>s</sub> = 2 \u00d7 f<sub>max</sub> = 2 \u00d7 ' + f + ' = <b>' + eng(fs, 'samples/s') + '</b>',
+        'Bits per sample: n<sub>b</sub> = log\u2082 L = log\u2082 ' + L + ' = <b>' + nb + ' bits</b>',
+        'Bit rate = f<sub>s</sub> \u00d7 n<sub>b</sub> = ' + fs + ' \u00d7 ' + nb + ' = <b>' + eng(br, 'bps') + '</b>',
+        'B<sub>min</sub> = n<sub>b</sub> \u00d7 B<sub>analog</sub> = ' + nb + ' \u00d7 ' + f + ' = <b>' + eng(nb * f, 'Hz') + '</b>  (= bit rate / 2)'
+      ],
+      ans: eng(fs, 'samples/s') + ', ' + nb + ' bits, ' + eng(br, 'bps') + ', ' + eng(nb * f, 'Hz')
+    };
+  }
+});
+
+T({
+  id: 'dac', name: 'ASK / FSK / PSK / QAM bandwidth', mod: 2, topic: 'Digital to analog',
+  heur: [
+    '<b>S = N / r</b>  and  <b>r = log\u2082 L</b>  (L = number of constellation points).',
+    'ASK and PSK/QAM: <b>B = (1 + d) &times; S</b>.',
+    'FSK: <b>B = (1 + d) &times; S + 2&Delta;f</b>.',
+    'Unless told otherwise take <b>d = 0</b>, so B = S.',
+    'State bandwidth in Hz, baud rate in baud.'
+  ],
+  watch: ['ASK: r = 1 always. BPSK: r = 1. QPSK: r = 2. 16-QAM: r = 4. 64-QAM: r = 6.', 'FSK is the only one with the extra 2\u0394f term \u2014 do not forget it.', 'Bandwidth answer is in Hz even though the input was bps.'],
+  gen: function () {
+    const kind = pick(['ASK', 'FSK', 'PSK', 'QAM']);
+    const N = pick([2000, 4000, 8000, 1000]);
+    const d = pick([0, 1]);
+    if (kind === 'FSK') {
+      const df = pick([50, 100, 25]);
+      const S = N / 1;
+      const B = (1 + d) * S + 2 * df;
+      return {
+        q: 'Find the bandwidth for an <b>FSK</b> signal transmitting at <b>' + eng(N, 'bps') + '</b>. Transmission is in half-duplex mode and the carriers are separated by <b>' + df + ' Hz</b>. Take d = ' + d + '.',
+        steps: [
+          'For FSK, r = 1, so S = N / r = ' + N + ' / 1 = ' + S + ' baud',
+          'B = (1 + d) \u00d7 S + 2\u0394f',
+          'B = (1 + ' + d + ') \u00d7 ' + S + ' + 2 \u00d7 ' + df + ' = ' + ((1 + d) * S) + ' + ' + (2 * df),
+          'B = <b>' + eng(B, 'Hz') + '</b>'
+        ],
+        ans: eng(B, 'Hz')
+      };
+    }
+    const L = kind === 'ASK' ? 2 : pick([4, 8, 16, 64]);
+    const r = log2(L);
+    const N2 = r * pick([500, 1000, 2000]);
+    const S = N2 / r;
+    const B = (1 + d) * S;
+    return {
+      q: 'Find the bandwidth and baud rate for a <b>' + (kind === 'ASK' ? 'ASK' : L + '-' + kind) + '</b> signal transmitting at <b>' + eng(N2, 'bps') + '</b>. Take d = ' + d + '.',
+      steps: [
+        'Number of levels L = ' + L + ', so r = log\u2082 L = ' + r + ' bits per signal element',
+        'S = N / r = ' + N2 + ' / ' + r + ' = <b>' + S + ' baud</b>',
+        'For ' + kind + ': B = (1 + d) \u00d7 S = (1 + ' + d + ') \u00d7 ' + S,
+        'B = <b>' + eng(B, 'Hz') + '</b>'
+      ],
+      ans: S + ' baud, B = ' + eng(B, 'Hz')
+    };
+  }
+});
+
+T({
+  id: 'fdm', name: 'FDM minimum bandwidth', mod: 2, topic: 'Multiplexing',
+  heur: [
+    'Count the channels <b>n</b> and the guard bands <b>n \u2212 1</b>.',
+    '<b>B<sub>link</sub> = n &times; B<sub>channel</sub> + (n \u2212 1) &times; B<sub>guard</sub></b>',
+    'Substitute and compute.',
+    'Draw the little spectrum diagram if there is space \u2014 it is usually worth a mark.'
+  ],
+  watch: ['Guard bands = n \u2212 1, NOT n. This is the single most common mistake in this question.', 'If no guard band is mentioned, it is just n \u00d7 B.'],
+  gen: function () {
+    const n = pick([4, 5, 6, 3]);
+    const B = pick([100, 50, 200]) * 1000;
+    const g = pick([10, 20, 5]) * 1000;
+    const tot = n * B + (n - 1) * g;
+    return {
+      q: '<b>' + n + ' channels</b>, each with a <b>' + eng(B, 'Hz') + '</b> bandwidth, are to be multiplexed together. What is the minimum bandwidth of the link if there is a need for a guard band of <b>' + eng(g, 'Hz') + '</b> between the channels to prevent interference?',
+      steps: [
+        'Number of channels n = ' + n + ', so the number of guard bands = n \u2212 1 = ' + (n - 1),
+        'B<sub>link</sub> = n \u00d7 B<sub>channel</sub> + (n \u2212 1) \u00d7 B<sub>guard</sub>',
+        'B<sub>link</sub> = ' + n + ' \u00d7 ' + B + ' + ' + (n - 1) + ' \u00d7 ' + g,
+        'B<sub>link</sub> = ' + (n * B) + ' + ' + ((n - 1) * g) + ' = <b>' + eng(tot, 'Hz') + '</b>'
+      ],
+      ans: eng(tot, 'Hz')
+    };
+  }
+});
+
+T({
+  id: 'tdm', name: 'Synchronous TDM', mod: 2, topic: 'Multiplexing',
+  heur: [
+    '(i) Bit duration before muxing = <b>1 / (input rate)</b>.',
+    '(ii) Link rate = <b>n &times; input rate</b> (when one unit = 1 bit).',
+    '(iii) Slot duration = <b>bit duration / n</b> = 1 / link rate.',
+    '(iv) Frame duration = <b>n &times; slot duration</b> = same as ONE input bit duration.',
+    'Frame rate = input rate / (bits per slot). Frame size = n \u00d7 bits per slot (+ sync bits).'
+  ],
+  watch: ['Frame duration equals the INPUT bit duration, not the slot duration. This catches everyone.', 'If a unit is 2 bits instead of 1, slot duration doubles and the frame carries 2n bits.', 'Add sync bits to the frame size only if the question mentions them.'],
+  gen: function () {
+    const n = pick([4, 5, 3, 6]);
+    const rate = pick([1000, 2000, 500]);
+    const link = n * rate;
+    return {
+      q: '<b>' + n + ' connections of ' + eng(rate, 'bps') + ' each</b> are multiplexed together using synchronous TDM. A unit is 1 bit. Find (i) the duration of 1 bit before multiplexing, (ii) the transmission rate of the link, (iii) the duration of a time slot, and (iv) the duration of a frame.',
+      steps: [
+        '(i) Bit duration before muxing = 1 / rate = 1 / ' + rate + ' = <b>' + eng(1 / rate, 's') + '</b>',
+        '(ii) Link rate = n \u00d7 rate = ' + n + ' \u00d7 ' + rate + ' = <b>' + eng(link, 'bps') + '</b>',
+        '(iii) Slot duration = bit duration / n = ' + eng(1 / rate, 's') + ' / ' + n + ' = <b>' + eng(1 / link, 's') + '</b> (= 1 / link rate \u2714)',
+        '(iv) Frame duration = n \u00d7 slot duration = ' + n + ' \u00d7 ' + eng(1 / link, 's') + ' = <b>' + eng(1 / rate, 's') + '</b>',
+        'Note: the frame duration equals the duration of one input bit \u2014 state this, it shows you understand it.'
+      ],
+      ans: eng(1 / rate, 's') + ' / ' + eng(link, 'bps') + ' / ' + eng(1 / link, 's') + ' / ' + eng(1 / rate, 's')
+    };
+  }
+});
+
+T({
+  id: 'crc', name: 'CRC generation', mod: 2, topic: 'Error detection',
+  heur: [
+    'Divisor has <b>n</b> bits \u2192 append <b>n \u2212 1 zeros</b> to the dataword.',
+    'Do <b>modulo-2 (XOR) division</b>: no borrow, no carry.',
+    'At each step: if the leading bit of the current remainder is 1, XOR with the divisor; if it is 0, XOR with all-zeros.',
+    'Bring down the next bit and repeat until all bits are used.',
+    'The final <b>n \u2212 1 bit remainder is the CRC</b>. Codeword = dataword + CRC.',
+    'To CHECK at the receiver: divide the received codeword by the same divisor. Remainder 0 \u2192 accept.'
+  ],
+  watch: ['XOR only. 1\u22951 = 0 with NO borrow. If you ever "borrow" you have gone wrong.', 'The remainder must have exactly n \u2212 1 bits \u2014 pad with leading zeros if needed.', 'Show the full long division in the answer sheet. Marks are for the working, not the final string.'],
+  gen: function () {
+    const pairs = [['101001111', '10111'], ['1001', '1011'], ['100100', '1101'], ['1101011011', '10011'], ['10110111', '1001']];
+    const p = pick(pairs);
+    const r = crcSteps(p[0], p[1]);
+    const st = ['Divisor <code>' + p[1] + '</code> has ' + p[1].length + ' bits, so append ' + (p[1].length - 1) + ' zeros to the dataword.',
+    'Augmented dataword = <code>' + p[0] + '0'.repeat(p[1].length - 1) + '</code>',
+    'Now do modulo-2 division (XOR, no borrow):'];
+    st.push('<pre class="ld">' + r.lines.map(function (l, i) {
+      return String(i + 1).padStart(2) + '.  ' + l.rem + '\n    ' + l.sub + '   ' + (l.useG ? '\u2190 XOR divisor (leading bit 1)' : '\u2190 XOR zeros (leading bit 0)') + '\n    ' + '-'.repeat(l.rem.length) + '\n    ' + l.res;
+    }).join('\n\n') + '</pre>');
+    st.push('Remainder (CRC) = <b><code>' + r.remainder + '</code></b>  (' + r.remainder.length + ' bits \u2714)');
+    st.push('Codeword sent = dataword + CRC = <b><code>' + p[0] + r.remainder + '</code></b>');
+    return {
+      q: 'Given the dataword <b><code>' + p[0] + '</code></b> and the divisor <b><code>' + p[1] + '</code></b>, show the generation of the CRC codeword at the sender site.',
+      steps: st,
+      ans: 'CRC = ' + r.remainder + ', codeword = ' + p[0] + r.remainder
+    };
+  }
+});
+
+T({
+  id: 'cksum', name: 'Internet checksum', mod: 2, topic: 'Error detection',
+  heur: [
+    'Split the data into <b>k words of n bits</b> (n = 16 for the real Internet checksum).',
+    'Add all words in <b>one\u2019s complement arithmetic</b>: if a carry comes out of the leftmost bit, <b>wrap it around and add it back</b>.',
+    '<b>Complement the final sum</b> \u2192 that is the checksum.',
+    'Send the data + checksum.',
+    'Receiver: add EVERYTHING including the checksum. Result must be all 1s; complement it \u2192 0 \u2192 accept.'
+  ],
+  watch: ['Wrapping the carry is the step people forget. Without it the answer is wrong.', 'Sender complements at the end; receiver checks for all-zeros AFTER complementing.', 'A checksum of all 0s means no error was detectable \u2014 write the verdict sentence explicitly.'],
+  gen: function () {
+    const n = 4;
+    const k = pick([4, 5]);
+    const w = []; for (let i = 0; i < k; i++) w.push(R(1, 14));
+    const res = onesSum(w, n);
+    const st = ['Data = (' + w.join(', ') + ') as ' + n + '-bit words: ' + w.map(function (x) { return '<code>' + bin(x, n) + '</code>'; }).join(', '),
+      'Add the words using one\u2019s complement arithmetic (wrap any carry out of the left end back into the right end):'];
+    let run = 0;
+    st.push('<pre class="ld">' + res.trace.map(function (t, i) {
+      return 'add ' + bin(w[i], n) + '  \u2192  running sum = ' + bin(t.s, n) + ' (' + t.s + ')' + t.note;
+    }).join('\n') + '</pre>');
+    st.push('Final sum = <code>' + bin(res.sum, n) + '</code> (' + res.sum + ')');
+    st.push('Checksum = complement of the sum = <b><code>' + bin(res.checksum, n) + '</code></b> (' + res.checksum + ')');
+    st.push('Sender transmits: ' + w.join(', ') + ', ' + res.checksum);
+    st.push('Receiver check: adding all ' + (k + 1) + ' values in one\u2019s complement gives <code>' + '1'.repeat(n) + '</code>; complementing gives <code>' + '0'.repeat(n) + '</code> \u2192 <b>no error, accept</b>.');
+    return {
+      q: 'Data is a list of ' + k + ' four-bit numbers: <b>(' + w.join(', ') + ')</b>. Find the checksum at the sender and show the check at the receiver.',
+      steps: st,
+      ans: 'checksum = ' + bin(res.checksum, n) + ' (' + res.checksum + ')'
+    };
+  }
+});
+
+T({
+  id: 'hamm', name: 'Hamming distance / detect & correct', mod: 2, topic: 'Error detection',
+  heur: [
+    '<b>d(x, y) = number of 1s in (x XOR y)</b>.',
+    '<b>d<sub>min</sub></b> = the smallest distance over ALL pairs of valid codewords.',
+    'To detect up to <b>s</b> errors: <b>d<sub>min</sub> \u2265 s + 1</b>.',
+    'To correct up to <b>t</b> errors: <b>d<sub>min</sub> \u2265 2t + 1</b>.',
+    'Answer with both the numeric d<sub>min</sub> and the verdict sentence.'
+  ],
+  watch: ['XOR then COUNT THE ONES. Do not count differing positions by eye on long words.', 'You must check every pair for d_min \u2014 list them in a small table.', 'Detect s errors and correct t errors are different formulas. Do not use s+1 for correction.'],
+  gen: function () {
+    const sets = [
+      ['0000', '0111', '1011', '1100'],
+      ['00000', '01011', '10101', '11110'],
+      ['000', '011', '101', '110'],
+      ['00000', '01011', '10110', '11101']
+    ];
+    const cw = pick(sets);
+    let dmin = 99; const rows = [];
+    for (let i = 0; i < cw.length; i++) for (let j = i + 1; j < cw.length; j++) {
+      let d = 0; for (let k = 0; k < cw[i].length; k++) if (cw[i][k] !== cw[j][k]) d++;
+      rows.push('d(' + cw[i] + ', ' + cw[j] + ') = ' + d);
+      if (d < dmin) dmin = d;
+    }
+    const s = dmin - 1;
+    const t = Math.floor((dmin - 1) / 2);
+    return {
+      q: 'A code has the valid codewords <b>' + cw.map(function (c) { return '<code>' + c + '</code>'; }).join(', ') + '</b>. Find the minimum Hamming distance, and state how many errors it can detect and how many it can correct.',
+      steps: [
+        'Hamming distance d(x,y) = number of 1s in x \u2295 y. Compute it for every pair:',
+        '<pre class="ld">' + rows.join('\n') + '</pre>',
+        'Minimum over all pairs: <b>d<sub>min</sub> = ' + dmin + '</b>',
+        'Detection: d<sub>min</sub> \u2265 s + 1  \u21d2  s \u2264 ' + dmin + ' \u2212 1 = <b>' + s + ' errors detectable</b>',
+        'Correction: d<sub>min</sub> \u2265 2t + 1  \u21d2  t \u2264 (' + dmin + ' \u2212 1)/2 = <b>' + t + ' error' + (t === 1 ? '' : 's') + ' correctable</b>'
+      ],
+      ans: 'dmin = ' + dmin + ', detect ' + s + ', correct ' + t
+    };
+  }
+});
+
+T({
+  id: 'csma', name: 'CSMA/CD minimum frame size', mod: 2, topic: 'CSMA/CD',
+  heur: [
+    'The rule: <b>T<sub>fr</sub> \u2265 2 &times; T<sub>p</sub></b> \u2014 a sender must still be transmitting when the worst-case collision signal returns.',
+    'If needed, <b>T<sub>p</sub> = distance / propagation speed</b>.',
+    '<b>Minimum frame size = bit rate &times; T<sub>fr</sub> = bit rate &times; 2T<sub>p</sub></b>.',
+    'Convert bits \u2192 bytes at the end if asked.',
+    'Finish with the sentence: "the frame must be at least X bits, so the transmission time is at least 2T<sub>p</sub>."'
+  ],
+  watch: ['It is 2 \u00d7 Tp (round trip), not Tp. Halving here is the classic slip.', 'Answer in BITS first, then convert to bytes. Do not divide by 8 mid-way.', 'If they give distance, you need the propagation speed too \u2014 use 2 \u00d7 10\u2078 m/s if not stated.'],
+  gen: function () {
+    const mode = pick(['tp', 'dist']);
+    if (mode === 'tp') {
+      const tp = pick([25.6, 12.8, 50]) * 1e-6;
+      const br = pick([10, 100]) * 1e6;
+      const tfr = 2 * tp;
+      const sz = br * tfr;
+      return {
+        q: 'A network using CSMA/CD has a bandwidth of <b>' + eng(br, 'bps') + '</b>. If the maximum propagation time is <b>' + eng(tp, 's') + '</b>, what is the minimum size of the frame?',
+        steps: [
+          'CSMA/CD requires T<sub>fr</sub> = 2 \u00d7 T<sub>p</sub>',
+          'T<sub>fr</sub> = 2 \u00d7 ' + sig(tp * 1e6, 4) + ' \u00b5s = <b>' + eng(tfr, 's') + '</b>',
+          'Frame size = bit rate \u00d7 T<sub>fr</sub> = ' + br + ' \u00d7 ' + sig(tfr, 4),
+          'Frame size = <b>' + sig(sz, 5) + ' bits</b> = <b>' + sig(sz / 8, 5) + ' bytes</b>',
+          'So a frame shorter than this could finish before a collision is detected \u2014 hence the minimum.'
+        ],
+        ans: sig(sz, 5) + ' bits (' + sig(sz / 8, 5) + ' bytes)'
+      };
+    }
+    const d = pick([2000, 2500, 1000]);
+    const v = 2e8;
+    const br = pick([10, 100]) * 1e6;
+    const tp = d / v;
+    const sz = br * 2 * tp;
+    return {
+      q: 'A CSMA/CD network of length <b>' + d + ' m</b> runs at <b>' + eng(br, 'bps') + '</b>. The propagation speed is <b>2 \u00d7 10\u2078 m/s</b>. Find the minimum frame size.',
+      steps: [
+        'T<sub>p</sub> = distance / speed = ' + d + ' / (2 \u00d7 10\u2078) = <b>' + eng(tp, 's') + '</b>',
+        'CSMA/CD requires T<sub>fr</sub> = 2 \u00d7 T<sub>p</sub> = <b>' + eng(2 * tp, 's') + '</b>',
+        'Frame size = bit rate \u00d7 T<sub>fr</sub> = ' + br + ' \u00d7 ' + sig(2 * tp, 4) + ' = <b>' + sig(sz, 5) + ' bits</b>',
+        '= <b>' + sig(sz / 8, 5) + ' bytes</b>'
+      ],
+      ans: sig(sz, 5) + ' bits (' + sig(sz / 8, 5) + ' bytes)'
+    };
+  }
+});
+
+T({
+  id: 'eth', name: 'Ethernet slot time / length / efficiency', mod: 2, topic: 'Ethernet',
+  heur: [
+    'Slot time = 512 bits. <b>Slot time (s) = 512 / bit rate</b>.',
+    '<b>MaxLength = (propagation speed &times; slot time) / 2</b>  (it is a ROUND trip).',
+    'Efficiency: <b>\u03b7 = 1 / (1 + 6.4a)</b> where <b>a = T<sub>p</sub> / T<sub>fr</sub></b>.',
+    'T<sub>fr</sub> = frame size / bit rate; T<sub>p</sub> = length / speed.',
+    'Quote the frame limits as facts: min 64 bytes, max 1518 bytes, data 46\u20131500 bytes, header+trailer 18 bytes.'
+  ],
+  watch: ['Divide by 2 for max length \u2014 the slot time covers there AND back.', 'a small \u2192 efficiency high. If you get efficiency > 1 you inverted a.', 'Padding is added when upper-layer data < 46 bytes; mention it if the question mentions a short frame.'],
+  gen: function () {
+    const mode = pick(['len', 'eff']);
+    if (mode === 'len') {
+      const br = pick([10, 100]) * 1e6;
+      const st = 512 / br;
+      const v = 2e8;
+      const L = v * st / 2;
+      return {
+        q: 'Standard Ethernet uses a slot time of <b>512 bits</b>. For a <b>' + eng(br, 'bps') + '</b> Ethernet with a propagation speed of <b>2 \u00d7 10\u2078 m/s</b>, find the slot time in seconds and the maximum network length.',
+        steps: [
+          'Slot time = 512 bits / bit rate = 512 / ' + br + ' = <b>' + eng(st, 's') + '</b>',
+          'The slot time covers a full round trip, so MaxLength = (speed \u00d7 slot time) / 2',
+          'MaxLength = (2 \u00d7 10\u2078 \u00d7 ' + sig(st, 4) + ') / 2 = <b>' + sig(L, 5) + ' m</b>',
+          'In practice the standard limits it further (2500 m for 10 Mbps) to allow for repeater delays.'
+        ],
+        ans: eng(st, 's') + ', ' + sig(L, 5) + ' m'
+      };
+    }
+    const br = 10e6;
+    const fs = pick([512, 1024, 8000]);
+    const len = pick([2500, 1000]);
+    const tp = len / 2e8, tfr = fs / br;
+    const a = tp / tfr;
+    const e = 1 / (1 + 6.4 * a);
+    return {
+      q: 'In a <b>10 Mbps</b> standard Ethernet of length <b>' + len + ' m</b>, frames are <b>' + fs + ' bits</b> long and the propagation speed is <b>2 \u00d7 10\u2078 m/s</b>. Find the efficiency.',
+      steps: [
+        'T<sub>p</sub> = length / speed = ' + len + ' / (2 \u00d7 10\u2078) = <b>' + eng(tp, 's') + '</b>',
+        'T<sub>fr</sub> = frame size / bit rate = ' + fs + ' / ' + br + ' = <b>' + eng(tfr, 's') + '</b>',
+        'a = T<sub>p</sub> / T<sub>fr</sub> = ' + sig(tp, 4) + ' / ' + sig(tfr, 4) + ' = <b>' + sig(a, 4) + '</b>',
+        'Efficiency = 1 / (1 + 6.4a) = 1 / (1 + 6.4 \u00d7 ' + sig(a, 4) + ') = <b>' + sig(e, 4) + '</b>',
+        'That is about ' + sig(e * 100, 3) + '%.'
+      ],
+      ans: sig(e, 4) + ' (' + sig(e * 100, 3) + '%)'
+    };
+  }
+});
+
+T({
+  id: 'sw', name: 'Stop-and-Wait / sliding window', mod: 2, topic: 'Flow control',
+  heur: [
+    '<b>T<sub>t</sub> = frame size / bandwidth</b>,  <b>T<sub>p</sub> = distance / speed</b>.',
+    '<b>a = T<sub>p</sub> / T<sub>t</sub></b>.',
+    'Stop-and-Wait utilisation: <b>U = T<sub>t</sub> / (T<sub>t</sub> + 2T<sub>p</sub>) = 1 / (1 + 2a)</b>.',
+    'Pipelined (window N): <b>U = N / (1 + 2a)</b>, capped at 1.',
+    'Bandwidth-delay product = <b>bandwidth &times; RTT</b> = number of bits that fill the pipe.',
+    'Window sizes: Go-Back-N \u2192 <b>2<sup>m</sup> \u2212 1</b>; Selective Repeat \u2192 <b>2<sup>m\u22121</sup></b>.'
+  ],
+  watch: ['RTT = 2 \u00d7 Tp. Do not forget the 2.', 'Go-Back-N is 2^m \u2212 1, Selective Repeat is 2^(m\u22121). Mixing these up is an instant zero.', 'If U comes out above 1, the pipe is full \u2014 cap at 1 and say so.'],
+  gen: function () {
+    const mode = pick(['util', 'win', 'bdp']);
+    if (mode === 'win') {
+      const m = pick([3, 4, 5]);
+      return {
+        q: 'A sliding-window protocol uses a <b>' + m + '-bit sequence number</b>. What is the maximum window size for Go-Back-N and for Selective Repeat?',
+        steps: [
+          'Sequence numbers run 0 to 2^m \u2212 1, i.e. 0 to ' + (Math.pow(2, m) - 1) + ' (' + Math.pow(2, m) + ' numbers).',
+          'Go-Back-N: window = 2^m \u2212 1 = ' + Math.pow(2, m) + ' \u2212 1 = <b>' + (Math.pow(2, m) - 1) + '</b>',
+          'Selective Repeat: window = 2^(m\u22121) = 2^' + (m - 1) + ' = <b>' + Math.pow(2, m - 1) + '</b>',
+          'Reason: GBN needs one spare number to tell a new frame from a duplicate; SR needs the send and receive windows to not overlap, so it gets only half.'
+        ],
+        ans: 'GBN ' + (Math.pow(2, m) - 1) + ', SR ' + Math.pow(2, m - 1)
+      };
+    }
+    if (mode === 'bdp') {
+      const B = pick([1e6, 10e6, 1.5e6]);
+      const rtt = pick([20, 40, 10]) * 1e-3;
+      return {
+        q: 'A channel has a bandwidth of <b>' + eng(B, 'bps') + '</b> and a round-trip time of <b>' + (rtt * 1000) + ' ms</b>. Find the bandwidth-delay product and explain what it means.',
+        steps: [
+          'Bandwidth-delay product = bandwidth \u00d7 RTT',
+          '= ' + B + ' \u00d7 ' + rtt + ' = <b>' + sig(B * rtt, 5) + ' bits</b>',
+          'Meaning: this is the number of bits that can be "in flight" on the link at once \u2014 the capacity of the pipe.',
+          'A Stop-and-Wait sender that sends only one frame per RTT wastes all but that one frame\u2019s worth of this capacity.'
+        ],
+        ans: sig(B * rtt, 5) + ' bits'
+      };
+    }
+    const B = pick([1e6, 4e6]);
+    const fs = pick([1000, 4000, 8000]);
+    const tp = pick([10, 20, 5]) * 1e-3;
+    const tt = fs / B;
+    const a = tp / tt;
+    const u = 1 / (1 + 2 * a);
+    return {
+      q: 'A Stop-and-Wait link has a bandwidth of <b>' + eng(B, 'bps') + '</b>, a frame size of <b>' + fs + ' bits</b> and a one-way propagation time of <b>' + (tp * 1000) + ' ms</b>. Find the link utilisation.',
+      steps: [
+        'T<sub>t</sub> = frame size / bandwidth = ' + fs + ' / ' + B + ' = <b>' + eng(tt, 's') + '</b>',
+        'T<sub>p</sub> = <b>' + eng(tp, 's') + '</b> (given)',
+        'a = T<sub>p</sub> / T<sub>t</sub> = ' + sig(tp, 4) + ' / ' + sig(tt, 4) + ' = <b>' + sig(a, 4) + '</b>',
+        'U = 1 / (1 + 2a) = 1 / (1 + 2 \u00d7 ' + sig(a, 4) + ') = <b>' + sig(u, 4) + '</b>',
+        'That is ' + sig(u * 100, 3) + '% \u2014 Stop-and-Wait is very inefficient when a is large.'
+      ],
+      ans: sig(u, 4) + ' (' + sig(u * 100, 3) + '%)'
+    };
+  }
+});
+
+
+
+
+/* ---------- state ---------- */
+var state = { active: {}, cur: null, shown: false, stats: {}, total: 0, hit: 0 };
+try {
+  var raw = localStorage.getItem('dcn-drill-v1');
+  if (raw) { var s = JSON.parse(raw); state.stats = s.stats || {}; state.total = s.total || 0; state.hit = s.hit || 0; }
+} catch (e) { /* storage unavailable, run without it */ }
+function save(){ try{ localStorage.setItem('dcn-drill-v1', JSON.stringify({stats:state.stats,total:state.total,hit:state.hit})); }catch(e){} }
+TYPES.forEach(function(t){ state.active[t.id] = true; });
+
+/* ---------- waveform ---------- */
+function waveSVG(scheme, b){
+  var segs = encodeWave(scheme, b), n = b.length;
+  var W = Math.max(340, n*54), unit = (W-40)/n, H = 132, mid = 72, amp = 30, x0 = 30;
+  var MF = '"IBM Plex Mono", ui-monospace, monospace';
+  var y = function(l){ return mid - l*amp; };
+  var out = '<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="'+scheme+' waveform">';
+  out += '<line x1="'+x0+'" y1="'+mid+'" x2="'+(x0+n*unit)+'" y2="'+mid+'" style="stroke:var(--rule);stroke-width:1"/>';
+  for(var i=0;i<=n;i++){
+    var x = x0+i*unit;
+    out += '<line x1="'+x+'" y1="28" x2="'+x+'" y2="'+(mid+amp+12)+'" style="stroke:var(--rule);stroke-width:1" stroke-dasharray="2 4"/>';
+    if(i<n) out += '<text x="'+(x+unit/2)+'" y="20" text-anchor="middle" style="font-family:'+MF+';font-size:13px;fill:var(--pencil)">'+b[i]+'</text>';
+  }
+  var d = '', px = x0, py = y(segs[0][0]);
+  d += 'M '+px+' '+py;
+  for(var j=0;j<n;j++){
+    var h1 = y(segs[j][0]), h2 = y(segs[j][1]);
+    if(py!==h1){ d += ' L '+px+' '+h1; }
+    d += ' L '+(px+unit/2)+' '+h1;
+    if(h1!==h2){ d += ' L '+(px+unit/2)+' '+h2; }
+    d += ' L '+(px+unit)+' '+h2;
+    px += unit; py = h2;
+  }
+  out += '<path d="'+d+'" fill="none" style="stroke:var(--blue);stroke-width:2.4;stroke-linejoin:miter"/>';
+  out += '<text x="4" y="'+(y(1)+4)+'" style="font-family:'+MF+';font-size:11px;fill:var(--faint)">+V</text>';
+  out += '<text x="6" y="'+(mid+4)+'" style="font-family:'+MF+';font-size:11px;fill:var(--faint)">0</text>';
+  out += '<text x="4" y="'+(y(-1)+4)+'" style="font-family:'+MF+';font-size:11px;fill:var(--faint)">\u2212V</text>';
+  return out+'</svg>';
+}
+
+/* ---------- drill ---------- */
+function pool(){ var p = TYPES.filter(function(t){ return state.active[t.id]; }); return p.length ? p : TYPES; }
+function nextQ(){
+  var p = pool();
+  var weighted = [];
+  p.forEach(function(t){
+    var st = state.stats[t.id] || {a:0,m:0};
+    var w = 1 + Math.min(3, st.m);            // drill what you keep missing
+    for(var i=0;i<w;i++) weighted.push(t);
+  });
+  var t = weighted[Math.floor(Math.random()*weighted.length)];
+  state.cur = { type: t, prob: t.gen() };
+  state.shown = false;
+  render();
+}
+function render(){
+  var t = state.cur.type, pr = state.cur.prob, h = '';
+  h += '<div class="meta"><span class="name">'+t.name+'</span><span>Module '+t.mod+'</span><span>'+t.topic+'</span></div>';
+  h += '<p class="q">'+pr.q+'</p>';
+  if(state.shown){
+    h += '<div class="stepbox"><p class="lbl">Write it in this order</p><ol class="steps">';
+    pr.steps.forEach(function(s){ h += '<li>'+s+'</li>'; });
+    h += '</ol>';
+    if(pr.wave) h += '<div class="wave">'+waveSVG(pr.wave.scheme, pr.wave.bits)+'</div>';
+    if(pr.ans !== 'see waveform') h += '<div class="final">Answer: '+pr.ans+'</div>';
+    h += '</div>';
+    h += '<div class="watch"><p class="lbl">Where marks get lost</p><ul>';
+    t.watch.forEach(function(w){ h += '<li>'+w+'</li>'; });
+    h += '</ul></div>';
+  } else {
+    h += '<p class="sub" style="margin-top:16px">Solve it on paper first. Then reveal.</p>';
+  }
+  document.getElementById('qcard').innerHTML = h;
+  bar();
+  quick();
+}
+function bar(){
+  var b = document.getElementById('bar');
+  if(document.getElementById('p-drill').hidden){ b.innerHTML = '<button class="btn ghost" onclick="setTab(\'drill\')">Back to drill</button>'; return; }
+  if(!state.shown){
+    b.innerHTML = '<button class="btn" onclick="reveal()">Show steps<kbd>space</kbd></button>'+
+                  '<button class="btn ghost" onclick="nextQ()">Skip<kbd>n</kbd></button>';
+  } else {
+    b.innerHTML = '<button class="btn good" onclick="mark(true)">Got it<kbd>1</kbd></button>'+
+                  '<button class="btn bad" onclick="mark(false)">Missed it<kbd>2</kbd></button>'+
+                  '<button class="btn ghost" onclick="nextQ()">Next<kbd>n</kbd></button>';
+  }
+}
+function reveal(){ state.shown = true; render(); }
+function mark(ok){
+  var id = state.cur.type.id;
+  var st = state.stats[id] || {a:0,m:0};
+  st.a++; if(!ok) st.m++;
+  state.stats[id] = st; state.total++; if(ok) state.hit++;
+  save(); nextQ();
+}
+function quick(){
+  var pct = state.total ? Math.round(100*state.hit/state.total) : 0;
+  document.getElementById('quickstats').innerHTML =
+    '<span>attempted <b>'+state.total+'</b></span><span>correct <b>'+pct+'%</b></span>'+
+    '<span>types on <b>'+pool().length+'</b>/'+TYPES.length+'</span>';
+}
+
+/* ---------- chips ---------- */
+function chips(){
+  var c = document.getElementById('chips'), h = '';
+  h += '<button class="chip" onclick="allOn(true)">All on</button><button class="chip" onclick="allOn(false)">All off</button>';
+  TYPES.forEach(function(t){
+    h += '<button class="chip" aria-pressed="'+(state.active[t.id]?'true':'false')+'" onclick="toggle(\''+t.id+'\')">'+t.name+'</button>';
+  });
+  c.innerHTML = h;
+}
+function toggle(id){ state.active[id] = !state.active[id]; chips(); quick(); }
+function allOn(v){ TYPES.forEach(function(t){ state.active[t.id] = v; }); chips(); quick(); }
+
+/* ---------- sheet ---------- */
+function sheet(){
+  var h = '<p class="sub">Every step skeleton in one place. Print this and keep it next to you while you practise.</p>';
+  [1,2].forEach(function(m){
+    h += '<hr class="d"><h2 style="font-size:13px;color:var(--faint);font-weight:600;margin-top:18px">MODULE '+m+'</h2>';
+    TYPES.filter(function(t){ return t.mod===m; }).forEach(function(t){
+      h += '<div class="card"><h2>'+t.name+'</h2><p class="topic">'+t.topic+'</p><ol>';
+      t.heur.forEach(function(s){ h += '<li>'+s+'</li>'; });
+      h += '</ol><div class="watch"><p class="lbl">Where marks get lost</p><ul>';
+      t.watch.forEach(function(w){ h += '<li>'+w+'</li>'; });
+      h += '</ul></div></div>';
+    });
+  });
+  document.getElementById('p-sheet').innerHTML = h;
+}
+
+/* ---------- stats ---------- */
+function statsPane(){
+  var rows = TYPES.map(function(t){
+    var s = state.stats[t.id] || {a:0,m:0};
+    return {t:t, a:s.a, m:s.m, rate: s.a ? s.m/s.a : 0};
+  }).filter(function(r){ return r.a > 0; }).sort(function(a,b){ return b.rate - a.rate || b.m - a.m; });
+  var h = '<div class="card">';
+  if(!rows.length){ h += '<p class="weak">Nothing recorded yet. Do a few questions and the types you keep missing will be listed here \u2014 and the drill will serve them to you more often.</p>'; }
+  else{
+    h += '<p class="lbl">Ranked by miss rate \u2014 drill the top of this list</p>';
+    rows.forEach(function(r){
+      h += '<p class="weak" style="margin:6px 0"><b>'+Math.round(100*r.rate)+'%</b> missed &nbsp; '+r.t.name+' &nbsp;<span style="color:var(--faint)">('+r.m+' of '+r.a+')</span></p>';
+    });
+    h += '<p style="margin-top:16px"><button class="chip" onclick="resetAll()">Clear all progress</button></p>';
+  }
+  h += '</div>';
+  document.getElementById('p-stats').innerHTML = h;
+}
+function resetAll(){ state.stats={}; state.total=0; state.hit=0; save(); statsPane(); quick(); }
+
+/* ---------- tabs ---------- */
+function setTab(n){
+  ['drill','sheet','stats'].forEach(function(k){
+    document.getElementById('p-'+k).hidden = (k!==n);
+    document.getElementById('t-'+k).setAttribute('aria-selected', k===n ? 'true':'false');
+  });
+  if(n==='stats') statsPane();
+  bar();
+  window.scrollTo(0,0);
+}
+
+/* ---------- keys ---------- */
+document.addEventListener('keydown', function(e){
+  if(document.getElementById('p-drill').hidden) return;
+  if(e.target.tagName==='BUTTON' && e.key===' ') return;
+  if(e.key===' '){ e.preventDefault(); if(!state.shown) reveal(); }
+  else if(e.key==='n' || e.key==='N'){ nextQ(); }
+  else if(e.key==='1' && state.shown){ mark(true); }
+  else if(e.key==='2' && state.shown){ mark(false); }
+});
+
+chips(); sheet(); nextQ();
+</script>
+</body>
+</html>
