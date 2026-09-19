@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DCN Interactive Simulations — Learn by Moving the Numbers</title>
+<style>
+:root{--bg:#071311;--panel:#0d1d19;--panel2:#10251f;--ink:#e9f5ef;--muted:#9eb5ac;--line:#28453c;--accent:#7ee0b2;--warn:#ffd27a;--bad:#ff8f85;--blue:#83bfff;--purple:#c7a4ff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 20% 0%,#123229 0,#071311 38%,#050b09 100%);color:var(--ink);font:15px/1.55 system-ui,-apple-system,Segoe UI,sans-serif}
+.wrap{max-width:1100px;margin:auto;padding:24px 16px 70px}.hero{margin-bottom:18px}.eyebrow{color:var(--accent);font-weight:800;letter-spacing:.08em;text-transform:uppercase;font-size:12px}
+h1{font-size:32px;line-height:1.08;margin:6px 0 8px}.sub{color:var(--muted);max-width:820px}
+.layout{display:grid;grid-template-columns:250px 1fr;gap:16px}.nav,.card{background:rgba(13,29,25,.94);border:1px solid var(--line);border-radius:14px}.nav{padding:10px;align-self:start;position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto}
+.nav button{width:100%;text-align:left;border:0;background:transparent;color:var(--muted);padding:10px;border-radius:9px;cursor:pointer}.nav button:hover,.nav button.active{background:#17342b;color:var(--ink)}.nav .group{font-size:11px;color:#668177;text-transform:uppercase;font-weight:800;padding:12px 10px 5px}
+.main{min-width:0}.card{padding:18px;margin-bottom:14px}.title{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.title h2{margin:0;font-size:23px}.badge{font-size:11px;padding:4px 8px;border:1px solid var(--line);border-radius:999px;color:var(--accent);white-space:nowrap}
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:16px 0}.control{background:var(--panel2);padding:11px;border-radius:10px}.control label{display:flex;justify-content:space-between;color:var(--muted);font-size:13px;margin-bottom:6px}.control output{color:var(--ink);font-weight:800}input[type=range]{width:100%;accent-color:var(--accent)}select,input[type=text]{width:100%;background:#071713;color:var(--ink);border:1px solid var(--line);border-radius:7px;padding:8px}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.btn{border:1px solid var(--line);background:#132a23;color:var(--ink);padding:9px 12px;border-radius:8px;cursor:pointer}.btn.primary{background:var(--accent);color:#052016;border-color:var(--accent);font-weight:800}.btn:hover{filter:brightness(1.12)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:9px}.kpi{background:#081714;border:1px solid var(--line);padding:12px;border-radius:10px}.kpi .v{font-size:20px;font-weight:900}.kpi .l{font-size:11px;color:var(--muted)}
+.why{border-left:3px solid var(--accent);padding:10px 12px;background:#0b211a;margin-top:14px}.why b{color:var(--accent)}
+.steps{display:grid;gap:8px;margin-top:14px}.step{display:grid;grid-template-columns:30px 1fr;gap:9px;padding:9px;border:1px solid var(--line);border-radius:9px;background:#0a1815}.num{width:25px;height:25px;border-radius:50%;display:grid;place-items:center;background:#18392f;color:var(--accent);font-weight:900}.step strong{color:var(--ink)}.step small{display:block;color:var(--muted);margin-top:2px}
+.viz{margin:14px 0;padding:12px;border:1px solid var(--line);border-radius:10px;background:#06110e;overflow:auto}.viz svg{display:block;width:100%;min-width:420px;height:210px}.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}.formula{font-size:18px;color:var(--warn);padding:10px 12px;background:#1a1a11;border-radius:9px;margin:10px 0}
+.note{color:var(--muted);font-size:13px}.pill{display:inline-block;border-radius:999px;padding:3px 8px;background:#17342b;color:var(--accent);font-size:12px;margin:2px}
+.quiz{background:#111c28;border:1px solid #28435b}.quiz button{margin-top:8px}.answer{display:none;color:var(--accent);margin-top:8px}.answer.show{display:block}
+@media(max-width:780px){.layout{grid-template-columns:1fr}.nav{position:relative;max-height:none}.nav button{display:inline-block;width:auto;margin:2px}.nav .group{display:inline-block;padding:7px}.title{flex-direction:column}h1{font-size:27px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <div class="eyebrow">DCN · learn by manipulating the system</div>
+    <h1>Interactive simulations, not just formula flashcards 🧠⚡</h1>
+    <p class="sub">This companion turns the concepts in your uploaded DCN drill into little laboratories. Change the inputs, press buttons, and watch the quantity that the formula is actually describing move. The point is to make each algebraic step feel inevitable.</p>
+  </section>
+  <div class="layout">
+    <nav class="nav" id="nav"></nav>
+    <main class="main" id="main"></main>
+  </div>
+</div>
+
+<script>
+const concepts = [
+{id:"nyq",g:"Module 1",name:"Nyquist bit rate",tag:"Data rate limits",formula:"Bit rate = 2 × B × log₂(L)",
+intro:"Nyquist answers: in a noiseless channel, how many bits per second can this bandwidth and number of signal levels represent?",
+controls:[["B",3000,1000,20000,1000,"Bandwidth (Hz)"],["L",4,2,16,2,"Signal levels"]],
+render(s){
+ const br=2*s.B*Math.log2(s.L);
+ return sim([
+  k("Bit rate",fmt(br)+" bps"),k("Bandwidth",fmt(s.B)+" Hz"),k("Levels",s.L),k("bits/level",Math.log2(s.L).toFixed(2)),
+ ],waveBars(s.L,s.B,br),[
+  step("1","Pick the theorem","The word <b>noiseless</b> is the trigger. That tells you which model governs the ceiling."),
+  step("2","Count information per signal element","log₂(L) tells you how many bits one signal element can represent. More levels = more information per symbol."),
+  step("3","Count how many signal elements the bandwidth permits","2B is the maximum symbol rate for the ideal noiseless channel."),
+  step("4","Multiply","2B × log₂(L) converts symbol opportunities into bits/second.")
+ ],`Try doubling L. Notice the answer does <b>not</b> double when you move from 4 → 8? It does: because log₂(8) grows by one bit. Try doubling B too.`)
+}},
+{id:"shan",g:"Module 1",name:"Shannon capacity",tag:"Data rate limits",formula:"C = B × log₂(1 + SNR)",
+intro:"Shannon answers the noisy-channel ceiling. The important mental move is that SNR is a ratio inside the logarithm; dB is only a representation of that ratio.",
+controls:[["B",3000,1000,20000,1000,"Bandwidth (Hz)"],["db",20,0,60,1,"SNR (dB)"]],
+render(s){
+ const snr=10**(s.db/10),c=s.B*Math.log2(1+snr);
+ return sim([k("Capacity",fmt(c)+" bps"),k("SNR ratio",fmt(snr)),k("SNR dB",s.db+" dB"),k("B",fmt(s.B)+" Hz")],
+ capacityChart(s.B,s.db,c),[
+  step("1","Convert dB → ratio","The logarithm expects SNR as a ratio. So SNR = 10^(dB/10)."),
+  step("2","Add 1","The theorem is log₂(1 + SNR), not log₂(SNR). That +1 matters especially at low SNR."),
+  step("3","Apply bandwidth","B scales the entire capacity."),
+  step("4","Interpret the ceiling","This is a maximum reliable data-rate limit, not a promise that a system automatically reaches it.")
+ ],`Slide SNR. You should see diminishing returns: adding a fixed amount of dB produces less dramatic capacity growth than simply multiplying SNR.`)
+}},
+{id:"both",g:"Module 1",name:"Nyquist + Shannon together",tag:"Data rate limits",formula:"Shannon sets the ceiling → Nyquist turns a chosen rate into levels",
+intro:"This is a two-model problem. First ask 'what can the channel tolerate?' Then ask 'how can I encode a practical rate?'",
+controls:[["B",1000000,500000,3000000,100000,"Bandwidth (Hz)"],["db",30,10,60,1,"SNR (dB)"],["rateFrac",0.5,0.1,0.95,0.05,"Chosen rate / Shannon capacity"]],
+render(s){
+ const C=s.B*Math.log2(1+10**(s.db/10)), rate=C*s.rateFrac, r=rate/(2*s.B), L=2**r;
+ return sim([k("Shannon ceiling",fmt(C)+" bps"),k("Chosen rate",fmt(rate)+" bps"),k("log₂L",r.toFixed(3)),k("Levels",fmt(L))],
+ twoCeil(C,rate,L),[
+  step("1","Shannon first","It gives the physical upper limit. You cannot responsibly choose a bit rate above it."),
+  step("2","Choose a rate below the ceiling","The chosen rate is an engineering choice, not a second theorem."),
+  step("3","Feed that rate to Nyquist","log₂L = BitRate/(2B), so L = 2^(BitRate/(2B))."),
+  step("4","Check practicality","If L becomes awkwardly huge, the chosen rate may be impractical even though it is mathematically below Shannon.")
+ ],`Drag the chosen-rate slider toward the Shannon ceiling. Watch the required number of levels explode. That's the trade-off this combined problem is testing.`)
+}},
+{id:"db",g:"Module 1",name:"Decibel / attenuation",tag:"Transmission impairment",formula:"dB = 10 log₁₀(P₂/P₁)",
+intro:"dB turns multiplicative power changes into additive quantities. That's why a chain of gains/losses can be solved by adding dB values.",
+controls:[["P",2,0.5,10,0.5,"Input power (mW)"],["loss",0.3,0,1,0.05,"Loss (dB/km)"],["km",10,1,30,1,"Cable length (km)"],["gain",0,0,20,1,"Amplifier gain (dB)"]],
+render(s){
+ const total=-s.loss*s.km+s.gain,p2=s.P*10**(total/10);
+ return sim([k("Total dB",(total>=0?"+":"")+total.toFixed(2)+" dB"),k("Input",s.P+" mW"),k("Output",fmt(p2)+" mW"),k("Power ratio",fmt(p2/s.P))],
+ dbChain(s.P,total),[
+  step("1","Compute each segment in dB","Loss is negative; gain is positive. Keep the signs."),
+  step("2","Add the dB values","This is the killer idea: series gains/losses add in dB."),
+  step("3","Convert back only at the end","P₂ = P₁ × 10^(dB/10)."),
+  step("4","Sanity check","Around −3 dB means roughly half the power; +3 dB roughly doubles it.")
+ ],`Try setting gain to exactly cancel the cable loss. The total dB becomes 0 and the output power returns to the input power.`)
+}},
+{id:"baud",g:"Module 1",name:"Bit rate vs baud",tag:"Digital signals",formula:"N = S × r ; r = log₂(L)",
+intro:"Bit rate counts bits. Baud counts signal elements per second. r tells you how many bits ride on each signal element.",
+controls:[["S",1000,500,4000,500,"Baud rate (symbols/s)"],["r",2,1,6,1,"Bits per signal element"]],
+render(s){
+ const N=s.S*s.r,L=2**s.r;
+ return sim([k("Bit rate",fmt(N)+" bps"),k("Baud",s.S+" baud"),k("Bits/element",s.r),k("Levels",fmt(L))],
+ symbolViz(s.S,s.r),[
+  step("1","Start with what is being counted","S = signal elements/second. N = bits/second."),
+  step("2","Ask how much information one element carries","r is bits per signal element."),
+  step("3","Multiply","N = S × r. This is dimensional reasoning: elements/s × bits/element = bits/s."),
+  step("4","If levels are asked","L = 2^r because r bits create 2^r possible patterns.")
+ ],`Hold baud constant and increase r. You are making each symbol carry more information rather than sending symbols faster.`)
+}},
+{id:"perf",g:"Module 1",name:"Delay, throughput & bit length",tag:"Performance",formula:"Tp = d/v ; Tt = size/B ; bit length = v/B",
+intro:"These problems are really about asking: is time determined by distance, by how much data I push, or by both?",
+controls:[["d",12,1,20,1,"Distance (km)"],["v",2e8,1e8,3e8,1e7,"Propagation speed (m/s)"],["size",8000,1000,20000,1000,"Message/frame (bits)"],["B",1e6,1e5,10e6,1e5,"Bandwidth (bps)"]],
+render(s){
+ const d=s.d*1000,tp=d/s.v,tt=s.size/s.B,bl=s.v/s.B;
+ return sim([k("Propagation time",fmt(tp*1e6)+" µs"),k("Transmission time",fmt(tt*1e6)+" µs"),k("Bit length",fmt(bl)+" m"),k("Total (these 2)",fmt((tp+tt)*1e6)+" µs")],
+ delayViz(tp,tt,bl),[
+  step("1","Propagation = distance / speed","This asks how long the signal physically takes to travel."),
+  step("2","Transmission = size / bandwidth","This asks how long it takes to push all the bits onto the link."),
+  step("3","Keep the causes separate","Changing distance should change Tp, not Tt. Changing message size should change Tt, not Tp."),
+  step("4","Add components when latency is requested","The full latency model can include propagation, transmission, queuing and processing.")
+ ],`Drag distance and message size independently. This is the easiest way to stop mixing up propagation delay and transmission delay.`)
+}},
+{id:"lcrate",g:"Module 1",name:"Line coding: signal rate & bandwidth",tag:"Line coding",formula:"S = c × N × (1/r) ; Bmin ≈ Save",
+intro:"The key is that a data rate and a signal rate are not the same thing. The coding scheme determines how many signal elements are needed.",
+controls:[["N",1000000,100000,10000000,100000,"Data rate (bps)"],["r",1,0.5,2,0.5,"r (bits/signal element)"],["c",0.5,0.333,1,0.167,"Case factor c"]],
+render(s){
+ const S=s.c*s.N/s.r;
+ return sim([k("Signal rate",fmt(S)+" baud"),k("Data rate",fmt(s.N)+" bps"),k("r",s.r),k("Min bandwidth",fmt(S)+" Hz")],
+ lineRate(s.N,s.r,s.c),[
+  step("1","Identify r","r tells you how much data one signal element represents."),
+  step("2","Use the average-case factor c","The provided drill uses c = 1/2 for average cases and 1/3 for MLT-3."),
+  step("3","Compute S","More signal elements per bit means a higher signal rate."),
+  step("4","Bandwidth follows signal rate","For the drill's model, minimum bandwidth equals average signal rate.")
+ ],`Try r = 1/2 (Manchester). One bit needs two signal elements, so the signal rate rises. That is the concept—not a random formula.`)
+}},
+{id:"wave",g:"Module 1",name:"Line-code waveform lab",tag:"Line coding",formula:"Apply one encoding rule to each bit",
+intro:"Instead of memorising a picture, manipulate the bits and watch the rule generate the waveform. Pick a scheme, then change one bit at a time.",
+controls:[["scheme","NRZ-L",null,null,null,"Encoding scheme"],["bits","10110011",null,null,null,"Bit sequence"]],
+render(s){
+ return sim([],waveform(s.scheme,s.bits),[
+  step("1","Mark bit boundaries","Every bit gets its own interval."),
+  step("2","Read only the scheme rule","NRZ-L uses level; NRZ-I uses transitions; Manchester always transitions in the middle; AMI alternates nonzero 1s."),
+  step("3","Walk left → right","Do not look ahead. Each bit updates the current level according to the rule."),
+  step("4","State assumptions","For NRZ-I and Differential Manchester, the starting level matters.")
+ ],`Change a single bit. Ask yourself: did the waveform change because the bit's <i>absolute level</i> changed, or because the bit caused a <i>transition</i>? That distinction is the whole game.`)
+}},
+{id:"pcm",g:"Module 2",name:"PCM / sampling",tag:"Analog → digital",formula:"fs = 2fmax ; bits/sample = log₂L ; bit rate = fs × bits/sample",
+intro:"PCM is a pipeline: sample often enough → choose a quantization level → turn every sample into bits.",
+controls:[["f",4000,1000,20000,1000,"Highest frequency (Hz)"],["L",64,2,1024,2,"Quantization levels"]],
+render(s){
+ const fs=2*s.f,nb=Math.log2(s.L),br=fs*nb;
+ return sim([k("Sampling rate",fmt(fs)+" samples/s"),k("Bits/sample",nb.toFixed(1)),k("Bit rate",fmt(br)+" bps"),k("Digital min B",fmt(br/2)+" Hz")],
+ pcmViz(s.f,s.L,fs,nb,br),[
+  step("1","Find the highest frequency","Nyquist sampling says the sampling rate must be at least twice the highest frequency."),
+  step("2","Turn levels into bits","log₂(L) answers how many bits are needed to label each quantization level."),
+  step("3","Multiply samples by bits/sample","That gives bits per second."),
+  step("4","Keep units straight","fs is samples/s (Hz); bit rate is bits/s (bps).")
+ ],`Double L. Sampling rate does not change; bits/sample does. Double f. Sampling rate and bit rate both change. That's the pipeline.`)
+}},
+{id:"dac",g:"Module 2",name:"ASK / FSK / PSK / QAM bandwidth",tag:"Digital → analog",formula:"S = N/r ; ASK/PSK/QAM: B=(1+d)S ; FSK adds 2Δf",
+intro:"The conversion chain is data rate → signal/baud rate → bandwidth. Modulation type determines the last step.",
+controls:[["N",4000,1000,12000,1000,"Data rate (bps)"],["r",2,1,6,1,"Bits/symbol"],["d",0,0,1,1,"Roll-off d"],["df",50,0,200,10,"FSK Δf (Hz)"]],
+render(s){
+ const S=s.N/s.r,ask=(1+s.d)*S,fsk=ask+2*s.df;
+ return sim([k("Baud rate",fmt(S)+" baud"),k("ASK/PSK/QAM B",fmt(ask)+" Hz"),k("FSK B",fmt(fsk)+" Hz"),k("FSK extra",fmt(2*s.df)+" Hz")],
+ modViz(S,ask,fsk),[
+  step("1","Convert bits → symbols","S = N/r. Higher r means more bits per symbol, so fewer symbols are needed."),
+  step("2","Apply the bandwidth model","ASK/PSK/QAM use (1+d)S in this drill."),
+  step("3","Treat FSK separately","FSK has the extra 2Δf term because its carriers are separated."),
+  step("4","Check units","N is bps; S is baud; B is Hz.")
+ ],`Set r from 1 to 4. The same data rate now needs one quarter as many symbols per second. Then switch Δf: only FSK should gain the extra bandwidth.`)
+}},
+{id:"fdm",g:"Module 2",name:"FDM minimum bandwidth",tag:"Multiplexing",formula:"Blink = nB + (n−1)G",
+intro:"The visual trick: put channels side by side. There is one guard band between each neighboring pair, so n channels create n−1 gaps.",
+controls:[["n",4,2,8,1,"Channels"],["B",100,25,300,25,"Bandwidth/channel (kHz)"],["G",10,0,40,5,"Guard band (kHz)"]],
+render(s){
+ const total=s.n*s.B+(s.n-1)*s.G;
+ return sim([k("Channel bandwidth",s.n*s.B+" kHz"),k("Guard bands",s.n-1),k("Guard total",(s.n-1)*s.G+" kHz"),k("Link total",total+" kHz")],
+ spectrum(s.n,s.B,s.G),[
+  step("1","Count channels","There are n channel blocks."),
+  step("2","Count spaces between them","n blocks create n−1 internal gaps."),
+  step("3","Add both","nB + (n−1)G."),
+  step("4","Use the picture as a checksum","If your algebra says 5 guard bands for 5 channels, look at the spectrum: there are only 4 internal gaps.")
+ ],`Drag n. The guard-band count should always be exactly one less than the number of channels.`)
+}},
+{id:"tdm",g:"Module 2",name:"Synchronous TDM",tag:"Multiplexing",formula:"Link rate = n×input rate ; slot = 1/link rate ; frame = 1/input rate",
+intro:"TDM shares time rather than frequency. Imagine a rotating selector giving every connection one slot in each frame.",
+controls:[["n",4,2,8,1,"Connections"],["rate",1000,250,4000,250,"Input rate (bps)"]],
+render(s){
+ const link=s.n*s.rate,bit=1/s.rate,slot=1/link;
+ return sim([k("Input bit",fmt(bit*1e6)+" µs"),k("Link rate",fmt(link)+" bps"),k("Slot",fmt(slot*1e6)+" µs"),k("Frame",fmt(bit*1e6)+" µs")],
+ tdmViz(s.n,bit,slot),[
+  step("1","Find one input's bit duration","1/rate tells you how often each source produces a bit."),
+  step("2","Interleave n sources","The link must carry n times as many bits per second."),
+  step("3","Split the input-bit interval","Each source gets one slot, so slot duration = bit duration/n."),
+  step("4","Reassemble the frame","n slots make one frame, bringing you back to the original input-bit duration.")
+ ],`Watch frame duration stay equal to one input bit duration even as the slot gets smaller. This is the TDM invariant worth remembering.`)
+}},
+{id:"crc",g:"Module 2",name:"CRC generation",tag:"Error detection",formula:"Append n−1 zeros → XOR divide → remainder is CRC",
+intro:"CRC is polynomial division implemented as XOR. The simulation exposes the current remainder so you can see why the leading bit decides whether the divisor participates.",
+controls:[["data","1001",null,null,null,"Dataword"],["gen","1011",null,null,null,"Divisor"]],
+render(s){
+ const tr=crcTrace(s.data,s.gen);
+ return sim([k("Data",s.data),k("Divisor",s.gen),k("CRC",tr.rem),k("Codeword",s.data+tr.rem)],
+ crcViz(tr),[
+  step("1","Append n−1 zeros","A divisor with n bits leaves an n−1-bit remainder."),
+  step("2","Look at the leading bit","If it is 1, XOR the divisor; if it is 0, XOR zeros."),
+  step("3","Bring down the next bit","That creates the next current remainder window."),
+  step("4","Stop when all bits are used","The final n−1 bits are the CRC. No carries. No borrows."),
+ ],`Press “next XOR step” to perform the division one operation at a time. If you catch yourself doing ordinary subtraction, stop: CRC is XOR.`)
+}},
+{id:"cksum",g:"Module 2",name:"Internet checksum",tag:"Error detection",formula:"one’s-complement add → wrap carry → complement",
+intro:"The checksum is deliberately simple: add fixed-width words, but any carry leaving the word wraps around to the right.",
+controls:[["a",5,1,15,1,"Word A"],["b",7,1,15,1,"Word B"],["c",3,1,15,1,"Word C"],["n",4,4,4,1,"Word size"]],
+render(s){
+ const mask=15,sum0=s.a+s.b,wrap=(sum0>mask)?((sum0&mask)+(sum0>>4)):sum0,sum1=wrap+s.c,final=(sum1>mask)?((sum1&mask)+(sum1>>4)):sum1,check=(~final)&mask;
+ return sim([k("A+B",sum0.toString(2)),k("Wrapped sum",bin(final)),k("Checksum",bin(check)),k("Receiver verdict","accept")],
+ checksumViz([s.a,s.b,s.c],final,check),[
+  step("1","Keep every word fixed width","Here the teaching version uses 4-bit words; the real Internet checksum uses 16-bit words."),
+  step("2","Add normally","A carry can appear outside the word."),
+  step("3","Wrap the carry around","Add the carry back into the low bits. This is one’s-complement arithmetic."),
+  step("4","Complement the final sum","That complement is the sender's checksum.")
+ ],`Push A+B above 15 and you will see the wraparound happen. That single operation is the bit people most often forget.`)
+}},
+{id:"hamm",g:"Module 2",name:"Hamming distance",tag:"Error detection",formula:"d(x,y) = number of 1s in x XOR y",
+intro:"Hamming distance is just a count of positions where two codewords disagree. The minimum distance across all valid pairs determines error capability.",
+controls:[["set",0,0,2,1,"Codeword set"]],
+render(s){
+ const sets=[["0000","0111","1011","1100"],["000","011","101","110"],["00000","01011","10101","11110"]];
+ const cw=sets[s.set],rows=[],ds=[];for(let i=0;i<cw.length;i++)for(let j=i+1;j<cw.length;j++){let d=0;for(let k=0;k<cw[i].length;k++)d+=cw[i][k]!==cw[j][k];rows.push([cw[i],cw[j],d]);ds.push(d)}
+ const dm=Math.min(...ds),det=dm-1,corr=Math.floor((dm-1)/2);
+ return sim([k("dmin",dm),k("Detect up to",det+" errors"),k("Correct up to",corr+" error"+(corr===1?"":"s")),k("Pairs checked",rows.length)],
+ hammingViz(rows,dm),[
+  step("1","XOR a pair","XOR produces 1 exactly where the bits differ."),
+  step("2","Count the ones","That count is the Hamming distance for that pair."),
+  step("3","Take the smallest pairwise distance","dmin describes the closest two valid codewords, which is the limiting case."),
+  step("4","Apply the capability rules","Detect s errors: dmin ≥ s+1. Correct t errors: dmin ≥ 2t+1.")
+ ],`Change the codeword set. The important conceptual move is not memorising the final formulas—it is understanding why the <i>closest</i> pair controls what errors can be distinguished.`)
+}},
+{id:"csma",g:"Module 2",name:"CSMA/CD minimum frame size",tag:"CSMA/CD",formula:"Tframe ≥ 2Tp ; frame bits = bit rate × Tframe",
+intro:"A sender must still be transmitting when a worst-case collision signal makes the round trip back. That physical timing constraint creates the minimum frame size.",
+controls:[["distance",2000,500,4000,250,"Distance (m)"],["rate",10,1,100,1,"Bit rate (Mbps)"],["v",2e8,1e8,3e8,1e7,"Propagation speed"]],
+render(s){
+ const tp=s.distance/s.v,tfr=2*tp,bits=s.rate*1e6*tfr;
+ return sim([k("One-way Tp",fmt(tp*1e6)+" µs"),k("Round trip",fmt(tfr*1e6)+" µs"),k("Min frame",fmt(bits)+" bits"),k("Bytes",fmt(bits/8)+" B")],
+ csmaViz(tp,tfr,bits),[
+  step("1","Find one-way propagation","Tp = distance/speed."),
+  step("2","Double it","Collision information must travel back: worst-case detection takes 2Tp."),
+  step("3","Turn time into bits","bit rate × required transmission time = minimum frame size."),
+  step("4","Interpret the rule","A frame that finishes too early could stop transmitting before the collision is heard.")
+ ],`Double distance. The minimum frame size doubles because the collision has farther to travel. Double bit rate and the required bits also double, while the required time stays the same.`)
+}},
+{id:"eth",g:"Module 2",name:"Ethernet slot time & efficiency",tag:"Ethernet",formula:"slot time = 512/rate ; max length ≈ v×slot/2 ; η=1/(1+6.4a)",
+intro:"Ethernet's slot time is a timing budget for collision detection. The efficiency equation then asks how much of the cycle is useful transmission versus propagation overhead.",
+controls:[["rate",10,1,100,1,"Rate (Mbps)"],["length",2500,500,3000,100,"Length (m)"],["frame",512,64,8000,64,"Frame (bits)"]],
+render(s){
+ const st=512/(s.rate*1e6),tp=s.length/2e8,tt=s.frame/(s.rate*1e6),a=tp/tt,e=1/(1+6.4*a),max=2e8*st/2;
+ return sim([k("Slot time",fmt(st*1e6)+" µs"),k("Max length (formula)",fmt(max)+" m"),k("a",a.toFixed(3)),k("Efficiency",fmt(e*100)+"%")],
+ ethViz(st,max,a,e),[
+  step("1","Slot time = 512 bits / rate","This converts the standardized 512-bit collision-detection window into seconds."),
+  step("2","Round trip → divide by 2","The slot covers there and back, so maximum one-way length uses half the propagation distance."),
+  step("3","Compute a = Tp/Tframe","This compares propagation overhead with actual frame transmission time."),
+  step("4","Efficiency","η = 1/(1+6.4a). Larger a means more waiting relative to useful transmission.")
+ ],`Make the frame longer. a gets smaller because transmission takes longer, so the same propagation delay is a smaller fraction of the cycle and efficiency rises.`)
+}},
+{id:"sw",g:"Module 2",name:"Stop-and-Wait / sliding window",tag:"Flow control",formula:"U = 1/(1+2a) ; window U = N/(1+2a) capped at 1",
+intro:"Stop-and-Wait sends one frame, then waits. Sliding windows keep several frames in flight. The simulation makes the 'pipe' visible.",
+controls:[["B",1,0.5,10,0.5,"Bandwidth (Mbps)"],["frame",4000,500,12000,500,"Frame (bits)"],["tp",10,1,50,1,"One-way propagation (ms)"],["N",1,1,20,1,"Window size"]],
+render(s){
+ const B=s.B*1e6,tt=s.frame/B,tp=s.tp/1000,a=tp/tt,stop=1/(1+2*a),pipe=Math.min(1,s.N/(1+2*a)),bdp=B*2*tp;
+ return sim([k("a = Tp/Tt",a.toFixed(2)),k("Stop&Wait",fmt(stop*100)+"%"),k("Window U",fmt(pipe*100)+"%"),k("BDP",fmt(bdp)+" bits")],
+ windowViz(stop,pipe,a,bdp,s.N),[
+  step("1","Compare propagation to transmission","a = Tp/Tt. Large a means the link spends lots of time waiting relative to sending a frame."),
+  step("2","Stop-and-Wait","U = 1/(1+2a). One outstanding frame cannot fill a long-delay pipe."),
+  step("3","Add a window","With N frames in flight, U = N/(1+2a), capped at 1."),
+  step("4","Think in terms of the pipe","Bandwidth-delay product tells you how many bits can be in flight during an RTT.")
+ ],`Increase N until utilisation hits 100%. That is the visual reason sliding windows exist: they keep the pipe busy while earlier frames are travelling.`)
+}}
+];
+
+function k(l,v){return {l,v}} function fmt(x){if(Math.abs(x)>=1e9)return (x/1e9).toFixed(2)+"G";if(Math.abs(x)>=1e6)return (x/1e6).toFixed(2)+"M";if(Math.abs(x)>=1e3)return (x/1e3).toFixed(2)+"k";if(Math.abs(x)<1)return x.toExponential(2);return x.toFixed(2)}
+function step(n,a,b){return `<div class="step"><div class="num">${n}</div><div><strong>${a}</strong><small>${b}</small></div></div>`}
+function sim(kpis,viz,steps,why){return `<div class="kpis">${kpis.map(x=>`<div class="kpi"><div class="v">${x.v}</div><div class="l">${x.l}</div></div>`).join("")}</div>${viz}<div class="steps">${steps.join("")}</div><div class="why"><b>Why this matters:</b> ${why}</div>`}
+function svg(inner){return `<div class="viz"><svg viewBox="0 0 760 210" role="img">${inner}</svg></div>`}
+function waveBars(L,B,br){let w=Math.min(70,30+L*3);let bars="";for(let i=0;i<Math.min(L,10);i++)bars+=`<rect x="${45+i*w}" y="${170-(i%5)*22}" width="${w-4}" height="${20+(i%5)*22}" rx="4" fill="#24483d"/><text x="${45+i*w+w/2}" y="198" fill="#9eb5ac" text-anchor="middle">${i+1}</text>`;return svg(`<text x="25" y="25" fill="#9eb5ac">More levels → more bits per signal element</text>${bars}<line x1="35" y1="170" x2="735" y2="170" stroke="#28453c"/><text x="35" y="50" fill="#7ee0b2">Bit rate: ${fmt(br)} bps</text><text x="35" y="72" fill="#ffd27a">2B = ${fmt(2*B)} signal elements/s</text>`)}
+function capacityChart(B,db,c){let sn=10**(db/10);let pts="";for(let x=0;x<=60;x+=5){let y=B*Math.log2(1+10**(x/10));let yy=175-Math.min(145,y/(Math.max(c,B*100))*145);pts+=`${35+x*11.5},${yy} `}return svg(`<polyline points="${pts}" fill="none" stroke="#7ee0b2" stroke-width="4"/><line x1="35" y1="175" x2="725" y2="175" stroke="#28453c"/><text x="40" y="28" fill="#9eb5ac">Capacity grows logarithmically with SNR</text><circle cx="${35+db*11.5}" cy="${175-Math.min(145,c/(Math.max(c,B*100))*145)}" r="7" fill="#ffd27a"/><text x="35" y="198" fill="#9eb5ac">0 dB</text><text x="690" y="198" fill="#9eb5ac">60 dB</text>`)}
+function twoCeil(C,rate,L){return svg(`<rect x="50" y="35" width="660" height="45" rx="8" fill="#203c34"/><rect x="50" y="35" width="${660*rate/C}" height="45" rx="8" fill="#7ee0b2"/><text x="60" y="63" fill="#071311">chosen rate</text><text x="470" y="63" fill="#9eb5ac">Shannon ceiling</text><text x="50" y="125" fill="#ffd27a">Required levels: ${fmt(L)}</text><text x="50" y="150" fill="#9eb5ac">As you push toward the ceiling, the encoding burden rises.</text>`)}
+function dbChain(P,total){let x=50,parts=`<text x="50" y="28" fill="#9eb5ac">Power travels through signed dB segments</text>`;let vals=[-Math.abs(total)/2,total+Math.abs(total)/2];vals.forEach((v,i)=>{let width=230;parts+=`<rect x="${x+i*270}" y="70" width="${width}" height="60" rx="8" fill="#17342b"/><text x="${x+i*270+12}" y="98" fill="#e9f5ef">${i?"output":"input"}</text><text x="${x+i*270+12}" y="119" fill="#7ee0b2">${i?fmt(P*10**(total/10))+" mW":P+" mW"}</text>`});parts+=`<text x="330" y="165" fill="#ffd27a">net dB = ${total.toFixed(2)} dB</text>`;return svg(parts)}
+function symbolViz(S,r){let n=Math.min(12,Math.max(3,Math.round(S/500)));let s="";for(let i=0;i<n;i++)s+=`<rect x="${35+i*58}" y="75" width="46" height="55" rx="7" fill="#17342b"/><text x="${58+i*58}" y="108" text-anchor="middle" fill="#7ee0b2">${r} bits</text>`;return svg(`<text x="35" y="35" fill="#9eb5ac">Each symbol carries ${r} bits</text>${s}`)}
+function delayViz(tp,tt,bl){return svg(`<rect x="45" y="55" width="300" height="45" rx="8" fill="#17342b"/><rect x="45" y="55" width="${Math.min(300,300*tp/(tp+tt))}" height="45" rx="8" fill="#83bfff"/><text x="55" y="83" fill="#071311">propagation ${fmt(tp*1e6)} µs</text><rect x="360" y="55" width="300" height="45" rx="8" fill="#17342b"/><rect x="360" y="55" width="${Math.min(300,300*tt/(tp+tt))}" height="45" rx="8" fill="#7ee0b2"/><text x="370" y="83" fill="#071311">transmission ${fmt(tt*1e6)} µs</text><text x="45" y="145" fill="#ffd27a">One bit occupies about ${fmt(bl)} m of the link.</text>`)}
+function lineRate(N,r,c){return svg(`<text x="40" y="40" fill="#9eb5ac">S = c × N ÷ r</text><text x="40" y="85" fill="#7ee0b2">${fmt(N)} bps</text><text x="290" y="85" fill="#ffd27a">÷ ${r}</text><text x="470" y="85" fill="#83bfff">× ${c}</text><text x="40" y="145" fill="#e9f5ef">= ${fmt(c*N/r)} baud</text>`)}
+function pcmViz(f,L,fs,nb,br){let p="";for(let i=0;i<14;i++){let x=45+i*50,y=105-45*Math.sin(i/2);p+=`<circle cx="${x}" cy="${y}" r="5" fill="#83bfff"/>`}return svg(`<path d="M40 105 C120 35 180 175 260 105 S400 35 470 105 S610 175 720 105" fill="none" stroke="#28453c" stroke-width="2"/><line x1="45" y1="25" x2="45" y2="180" stroke="#28453c"/><text x="45" y="198" fill="#9eb5ac">sampling at ${fmt(fs)} samples/s</text>${p}<text x="450" y="35" fill="#7ee0b2">${nb} bits/sample × ${fmt(fs)} samples/s = ${fmt(br)} bps</text>`)}
+function modViz(S,B,F){return svg(`<rect x="40" y="65" width="220" height="55" rx="8" fill="#17342b"/><text x="55" y="98" fill="#7ee0b2">N/r = ${fmt(S)} baud</text><rect x="300" y="65" width="180" height="55" rx="8" fill="#17342b"/><text x="315" y="98" fill="#83bfff">non-FSK ${fmt(B)} Hz</text><rect x="520" y="65" width="190" height="55" rx="8" fill="#17342b"/><text x="535" y="98" fill="#ffd27a">FSK ${fmt(F)} Hz</text><text x="40" y="155" fill="#9eb5ac">Only FSK receives the extra 2Δf term.</text>`)}
+function spectrum(n,B,G){let p="";for(let i=0;i<n;i++){let x=35+i*(650/n);p+=`<rect x="${x}" y="75" width="${650/n-G*1.8}" height="55" rx="3" fill="#17342b"/><text x="${x+20}" y="108" fill="#7ee0b2">C${i+1}</text>`}return svg(p+`<text x="35" y="45" fill="#ffd27a">${n-1} guard bands, each ${G} kHz</text>`)}
+function tdmViz(n,bit,slot){let p="";for(let i=0;i<n;i++)p+=`<rect x="${40+i*(680/n)}" y="75" width="${650/n-4}" height="55" rx="5" fill="#17342b"/><text x="${40+i*(680/n)+20}" y="108" fill="#7ee0b2">S${i+1}</text>`;return svg(p+`<text x="40" y="42" fill="#9eb5ac">frame = ${fmt(bit*1e6)} µs; each slot = ${fmt(slot*1e6)} µs</text>`)}
+function crcTrace(data,gen){let aug=data+"0".repeat(gen.length-1),n=gen.length;let rem=aug.slice(0,n),pos=n,steps=[];while(true){let use=rem[0]==="1",sub=use?gen:"0".repeat(n),res="";for(let i=0;i<n;i++)res+=(+rem[i]^+sub[i]);steps.push({rem,sub,res,use});let next=res.slice(1);if(pos<aug.length){next+=aug[pos++];rem=next}else{rem=next;break}}return{steps,rem:rem.padStart(n-1,"0")}}
+function crcViz(t){return svg(`<text x="35" y="30" fill="#9eb5ac">XOR division — each step uses the leading bit</text>${t.steps.slice(0,6).map((q,i)=>`<text x="35" y="${65+i*22}" class="mono" fill="${q.use?"#7ee0b2":"#9eb5ac"}">${i+1}. ${q.rem} ⊕ ${q.sub} = ${q.res}</text>`).join("")}<text x="35" y="200" fill="#ffd27a">final remainder = ${t.rem}</text>`)}
+function bin(n){return n.toString(2).padStart(4,"0")}
+function checksumViz(ws,final,check){return svg(ws.map((w,i)=>`<text x="45" y="${40+i*25}" fill="#9eb5ac">word ${i+1}: ${bin(w)}</text>`).join("")+`<text x="350" y="65" fill="#7ee0b2">wrapped final sum: ${bin(final)}</text><text x="350" y="100" fill="#ffd27a">complement → checksum ${bin(check)}</text>`)}
+function hammingViz(rows,dm){return svg(rows.map((r,i)=>`<text x="40" y="${30+i*28}" fill="#9eb5ac">d(${r[0]},${r[1]}) = ${r[2]}</text>`).join("")+`<text x="420" y="55" fill="#7ee0b2">dmin = ${dm}</text><text x="420" y="90" fill="#ffd27a">closest codewords control capability</text>`)}
+function csmaViz(tp,tfr,bits){return svg(`<rect x="50" y="70" width="620" height="35" rx="8" fill="#17342b"/><rect x="50" y="70" width="310" height="35" rx="8" fill="#7ee0b2"/><text x="55" y="93" fill="#071311">send frame</text><line x1="360" y1="45" x2="360" y2="125" stroke="#ffd27a" stroke-width="3"/><text x="375" y="60" fill="#ffd27a">collision must return by 2Tp</text><text x="50" y="160" fill="#9eb5ac">minimum = ${fmt(bits)} bits</text>`)}
+function ethViz(st,max,a,e){return svg(`<line x1="60" y1="165" x2="700" y2="165" stroke="#28453c"/><rect x="60" y="80" width="${Math.min(640,640*e)}" height="45" rx="7" fill="#7ee0b2"/><text x="70" y="108" fill="#071311">useful transmission ≈ ${fmt(e*100)}%</text><text x="60" y="40" fill="#9eb5ac">slot ${fmt(st*1e6)} µs → formula max length ≈ ${fmt(max)} m</text><text x="60" y="190" fill="#ffd27a">a = ${a.toFixed(3)}; larger a means more overhead</text>`)}
+function windowViz(stop,pipe,a,bdp,N){return svg(`<rect x="45" y="65" width="650" height="45" rx="8" fill="#17342b"/><rect x="45" y="65" width="${650*stop}" height="45" rx="8" fill="#83bfff"/><text x="55" y="93" fill="#071311">Stop-and-Wait ${fmt(stop*100)}%</text><rect x="45" y="125" width="${650*pipe}" height="28" rx="6" fill="#7ee0b2"/><text x="55" y="145" fill="#071311">window N=${N}: ${fmt(pipe*100)}%</text><text x="45" y="35" fill="#9eb5ac">a=${a.toFixed(2)} · BDP=${fmt(bdp)} bits</text>`)}
+function waveform(scheme,bits){let levels=[];let lvl=1,alt=1;for(const ch of bits){let b=+ch;if(scheme==="NRZ-L")levels.push(b?[-1,-1]:[1,1]);else if(scheme==="NRZ-I"){if(b)lvl=-lvl;levels.push([lvl,lvl])}else if(scheme==="RZ")levels.push(b?[1,0]:[-1,0]);else if(scheme==="Manchester")levels.push(b?[-1,1]:[1,-1]);else if(scheme==="Differential Manchester"){let start=b?lvl:-lvl;levels.push([start,-start]);lvl=-start}else if(scheme==="AMI"){if(!b)levels.push([0,0]);else{levels.push([alt,alt]);alt=-alt}}else{if(b)levels.push([0,0]);else{levels.push([alt,alt]);alt=-alt}}}
+let path="",x0=35,w=680/bits.length;levels.forEach((q,i)=>{let x=x0+i*w,y1=105-q[0]*42,y2=105-q[1]*42;path+=(i?"L":"M")+x+" "+y1+"L"+(x+w/2)+" "+y1+"L"+(x+w/2)+" "+y2+"L"+(x+w)+" "+y2;});let labels=bits.split("").map((b,i)=>`<text x="${x0+i*w+w/2}" y="25" text-anchor="middle" fill="#ffd27a">${b}</text><line x1="${x0+i*w}" y1="35" x2="${x0+i*w}" y2="175" stroke="#28453c"/>`).join("");return svg(labels+`<path d="${path}" fill="none" stroke="#7ee0b2" stroke-width="4" stroke-linejoin="round"/><line x1="35" y1="105" x2="715" y2="105" stroke="#28453c"/><text x="40" y="195" fill="#9eb5ac">${scheme}</text>`)}
+function control(c){const [id,val,min,max,step,label]=c;if(id==="scheme")return `<div class="control"><label>${label}</label><select data-id="scheme"><option>NRZ-L</option><option>NRZ-I</option><option>RZ</option><option>Manchester</option><option>Differential Manchester</option><option>AMI</option><option>Pseudoternary</option></select></div>`;if(id==="bits")return `<div class="control"><label>${label}</label><select data-id="bits"><option>10110011</option><option>01001110</option><option>11100011</option><option>10010110</option></select></div>`;return `<div class="control"><label>${label}<output data-out="${id}">${val}</output></label><input type="range" data-id="${id}" min="${min}" max="${max}" step="${step}" value="${val}"></div>`}
+function draw(c,values){main.innerHTML=`<div class="card"><div class="title"><div><div class="eyebrow">${c.g} · ${c.tag}</div><h2>${c.name}</h2><p class="sub">${c.intro}</p></div><span class="badge">interactive</span></div><div class="formula">${c.formula}</div><div class="controls">${c.controls.map(control).join("")}</div><div id="result"></div><div class="btns"><button class="btn primary" id="reset">Reset this lab</button><button class="btn" id="random">Randomise inputs</button></div><div class="card quiz"><b>🧪 Tiny self-test</b><p id="q"></p><button class="btn" id="show">Show answer</button><div class="answer" id="ans"></div></div></div>`;bind(c,values)}
+function read(c){let v={};c.controls.forEach(([id,val])=>{const el=document.querySelector(`[data-id="${id}"]`);v[id]=el.type==="range"?+el.value:el.value});return v}
+function bind(c,initial){document.querySelectorAll("[data-id]").forEach(el=>el.addEventListener("input",()=>update(c)));document.getElementById("reset").onclick=()=>draw(c,Object.fromEntries(c.controls.map(x=>[x[0],x[1]])));document.getElementById("random").onclick=()=>{c.controls.forEach(x=>{const el=document.querySelector(`[data-id="${x[0]}"]`);if(el.type==="range")el.value=x[2]+Math.random()*(x[3]-x[2]);});update(c)};update(c)}
+function update(c){const v=read(c);c.controls.forEach(([id])=>{const o=document.querySelector(`[data-out="${id}"]`);const e=document.querySelector(`[data-id="${id}"]`);if(o)o.textContent=e.value});const r=c.render(v);document.getElementById("result").innerHTML=r;quiz(c,v)}
+function quiz(c,v){let q="",a="";if(c.id==="nyq"){q="If bandwidth doubles while L stays fixed, what happens to the Nyquist bit rate?";a="It doubles, because B is a direct multiplier."}else if(c.id==="shan"){q="Why can't you plug 20 dB directly into log₂(1+SNR)?";a="Because 20 dB is not the ratio; first convert it with 10^(20/10)."}else if(c.id==="fdm"){q="For 6 channels, how many internal guard bands are there?";a="5. There is one gap between each neighboring pair."}else if(c.id==="csma"){q="Why is it 2Tp instead of Tp?";a="The collision signal has to travel to the other end and return before the sender can be sure it heard the collision."}else if(c.id==="crc"){q="What operation replaces subtraction in CRC division?";a="XOR. There are no carries and no borrows."}else if(c.id==="sw"){q="What is the purpose of increasing the sliding window?";a="To keep multiple frames in flight so the sender does not sit idle during propagation/RTT."}else {q="What is the most important question this simulation is helping you answer?";a="Ask what each quantity physically counts or measures before touching the formula."}document.getElementById("q").textContent=q;document.getElementById("ans").textContent=a;document.getElementById("show").onclick=()=>document.getElementById("ans").classList.toggle("show")}
+function nav(){navEl.innerHTML=concepts.map((c,i)=>`<div class="group">${c.g}</div><button data-i="${i}">${c.name}</button>`).join("");navEl.querySelectorAll("button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");draw(concepts[+b.dataset.i])})}
+const navEl=document.getElementById("nav"),main=document.getElementById("main");nav();navEl.querySelector("button").click();
+</script>
+</body>
+</html>
