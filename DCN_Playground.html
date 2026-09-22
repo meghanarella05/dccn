@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DCN Playground — Modules 1 & 2</title>
+<style>
+:root{--bg:#0b1110;--panel:#121b18;--panel2:#17231f;--ink:#e9f1ed;--muted:#9fb0a8;--accent:#7ee2a8;--blue:#7fb7ff;--red:#ff8c7a;--line:#294039}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px system-ui,-apple-system,Segoe UI,sans-serif}
+.wrap{max-width:1200px;margin:auto;padding:22px 18px 70px}h1{margin:0 0 4px;font-size:26px}.sub{color:var(--muted);margin-bottom:18px}
+.tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}.tab,button{border:1px solid var(--line);background:var(--panel2);color:var(--ink);padding:9px 12px;border-radius:9px;cursor:pointer}.tab.active,button:hover{border-color:var(--accent)}
+.grid{display:grid;grid-template-columns:260px 1fr;gap:14px}.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:15px}.topics button{display:block;width:100%;text-align:left;margin:6px 0}.topics button.active{background:#1d332b;border-color:var(--accent)}
+h2{font-size:19px;margin:0 0 10px}h3{font-size:15px;margin:16px 0 7px}.formula{font:600 15px ui-monospace,monospace;background:#0a100e;border:1px solid var(--line);padding:10px;border-radius:8px;margin:7px 0}
+.step{padding:9px 10px;border-left:3px solid var(--line);margin:7px 0;color:#cbd8d2}.step.hot{border-color:var(--accent);background:#13221c}
+label{display:block;color:var(--muted);font-size:12px;margin:9px 0 3px}input,select{width:100%;background:#0b1210;color:var(--ink);border:1px solid var(--line);border-radius:7px;padding:9px}
+.row{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.answer{margin-top:12px;padding:12px;border-radius:9px;background:#10251b;border:1px solid #2f6549}.warn{color:#ffca8a}.tiny{font-size:12px;color:var(--muted)}.hidden{display:none}.bar{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>🧠 DCN Playground</h1>
+<div class="sub">Modules 1 & 2 · Trigger → Formula → Mechanics → Answer. Built from your DCN drill source.</div>
+<div class="tabs"><button class="tab active" onclick="setMode('learn',this)">Learn</button><button class="tab" onclick="setMode('drill',this)">Drill</button></div>
+
+<div class="grid">
+<aside class="card topics" id="topics"></aside>
+<main class="card">
+<div id="content"></div>
+<div id="drill" class="hidden"></div>
+</main>
+</div>
+</div>
+
+<script>
+const topics=[
+['nyquist','Nyquist / noiseless'],['shannon','Shannon / noisy'],['delay','Propagation vs transmission'],
+['baud','Bit rate vs baud'],['pcm','PCM / sampling'],['dac','ASK / FSK / PSK / QAM'],
+['fdm','FDM'],['tdm','Synchronous TDM'],['crc','CRC'],['checksum','Checksum'],
+['hamming','Hamming distance'],['csma','CSMA/CD'],['ethernet','Ethernet'],['sw','Stop-and-Wait / windows']
+];
+let current='nyquist',mode='learn',step=0, streak=0;
+
+const data={
+nyquist:{title:'Nyquist — noiseless channel',trigger:'NOISELESS / signal levels → NYQUIST',
+formula:'R = 2B log₂L',
+inputs:[['R','Bit rate (bps)',800000],['B','Bandwidth (Hz)',20000],['L','Levels',16]],
+calc(v){if(v.L) return {steps:[`R = 2 × B × log₂L`,`R = 2 × ${v.B} × log₂(${v.L})`,`R = ${2*v.B*Math.log2(v.L)} bps`],ans:`Maximum bit rate = ${2*v.B*Math.log2(v.L)} bps`}},
+trap:'If L is unknown: L = 2^(R/2B).'},
+shannon:{title:'Shannon — noisy channel',trigger:'SNR / noise → SHANNON',
+formula:'C = B log₂(1 + SNR),  SNR = 10^(dB/10)',
+inputs:[['B','Bandwidth (Hz)',30000],['db','SNR (dB)',20]],
+calc(v){let s=10**(v.db/10),c=v.B*Math.log2(1+s);return {steps:[`SNR = 10^(${v.db}/10) = ${s}`,`C = ${v.B} × log₂(1 + ${s})`,`C ≈ ${c.toFixed(2)} bps`],ans:`Channel capacity ≈ ${c.toFixed(2)} bps`}},
+trap:'Do NOT plug dB directly into Shannon. Convert dB to linear SNR first.'},
+delay:{title:'Propagation vs transmission delay',trigger:'DISTANCE / SPEED → propagation. SIZE / RATE → transmission.',
+formula:'Tp = distance / v     Tt = message size / bandwidth',
+inputs:[['d','Distance (m)',5000],['v','Propagation speed (m/s)',200000000],['bits','Message size (bits)',120000],['rate','Bandwidth (bps)',1000000]],
+calc(v){return {steps:[`Tp = ${v.d} / ${v.v} = ${(v.d/v.v).toExponential(3)} s`,`Tt = ${v.bits} / ${v.rate} = ${(v.bits/v.rate).toFixed(4)} s`],ans:`Tp = ${(v.d/v.v).toExponential(3)} s · Tt = ${(v.bits/v.rate).toFixed(4)} s`}},
+trap:'Propagation is travel time. Transmission is push-the-bits-onto-the-link time.'},
+baud:{title:'Bit rate vs baud',trigger:'BITS / SIGNAL ELEMENTS → baud',
+formula:'N = S × r,  S = N/r,  r = log₂L',
+inputs:[['N','Bit rate (bps)',12000],['L','Levels',8]],
+calc(v){let r=Math.log2(v.L),s=v.N/r;return {steps:[`r = log₂(${v.L}) = ${r} bits/symbol`,`S = ${v.N} / ${r} = ${s} baud`],ans:`${s} baud`}},
+trap:'Bit rate and baud are NOT automatically the same. They match when r = 1.'},
+pcm:{title:'PCM / sampling',trigger:'ANALOG → sampling → levels → bits → bit rate',
+formula:'fs = 2fmax · nb = log₂L · bit rate = fs×nb',
+inputs:[['f','Highest frequency (Hz)',4000],['L','Quantization levels',256]],
+calc(v){let fs=2*v.f,nb=Math.log2(v.L),br=fs*nb;return {steps:[`fs = 2 × ${v.f} = ${fs} samples/s`,`nb = log₂(${v.L}) = ${nb} bits/sample`,`bit rate = ${fs} × ${nb} = ${br} bps`],ans:`fs=${fs} Hz · ${nb} bits/sample · ${br} bps`}},
+trap:'Sampling uses 2 × highest frequency. Levels → bits uses log₂.'},
+dac:{title:'ASK / FSK / PSK / QAM',trigger:'MODULATION → bits/symbol → baud → bandwidth',
+formula:'r=log₂L · S=N/r · ASK/PSK/QAM: B=(1+d)S · FSK adds 2Δf',
+inputs:[['N','Bit rate (bps)',8000],['L','Levels',4],['d','Roll-off d',0],['df','Δf for FSK (Hz)',100]],
+calc(v){let r=Math.log2(v.L),s=v.N/r,b=(1+v.d)*s+2*v.df;return {steps:[`r = log₂(${v.L}) = ${r}`,`S = ${v.N}/${r} = ${s} baud`,`If FSK: B=(1+${v.d})×${s}+2×${v.df} = ${b} Hz`,`For ASK/PSK/QAM with same d: B=(1+d)S`],ans:`Baud = ${s}; FSK bandwidth = ${b} Hz`}},
+trap:'FSK is the one with the extra +2Δf term. ASK and BPSK have r=1.'},
+fdm:{title:'FDM minimum bandwidth',trigger:'MULTIPLE CHANNELS + GUARD BANDS',
+formula:'B_link = nB_channel + (n−1)B_guard',
+inputs:[['n','Channels',5],['B','Bandwidth/channel (Hz)',50000],['g','Guard band (Hz)',5000]],
+calc(v){let x=v.n*v.B+(v.n-1)*v.g;return {steps:[`Guard bands = n−1 = ${v.n-1}`,`B = ${v.n}×${v.B} + ${v.n-1}×${v.g}`,`B = ${x} Hz`],ans:`Minimum link bandwidth = ${x} Hz`}},
+trap:'Guard bands = n−1, NOT n.'},
+tdm:{title:'Synchronous TDM',trigger:'TIME SLOTS → LINK RATE / SLOT / FRAME',
+formula:'Rlink=nR · Tslot=1/Rlink · Tframe=1/R',
+inputs:[['n','Input channels',4],['R','Input rate (bps)',1000]],
+calc(v){let rl=v.n*v.R,ts=1/rl,tf=1/v.R;return {steps:[`Link rate = ${v.n}×${v.R} = ${rl} bps`,`Slot duration = 1/${rl} = ${ts.toExponential(3)} s`,`Frame duration = 1/${v.R} = ${tf.toExponential(3)} s`],ans:`Rlink=${rl} bps · slot=${ts.toExponential(3)} s · frame=${tf.toExponential(3)} s`}},
+trap:'Frame duration equals ONE input bit duration in the simple 1-bit-per-slot case.'},
+crc:{title:'CRC',trigger:'DIVISOR BITS → append zeros → XOR division → remainder',
+formula:'append (n−1) zeros; modulo-2 division uses XOR',
+inputs:[['data','Dataword (binary)', '1101011011'],['div','Divisor (binary)','10011']],
+calc(v){let a=v.data+'0'.repeat(v.div.length-1),bits=a.split('').map(Number),d=v.div.split('').map(Number);for(let i=0;i<=bits.length-d.length;i++)if(bits[i])for(let j=0;j<d.length;j++)bits[i+j]^=d[j];let rem=bits.slice(-(d.length-1)).join(''),cw=v.data+rem;return {steps:[`Append ${d.length-1} zeros: ${a}`,`Perform XOR long division using ${v.div}`,`Remainder = ${rem}`,`Codeword = data + remainder = ${cw}`],ans:`CRC = ${rem} · Codeword = ${cw}`}},
+trap:'No carries, no borrows. XOR only.'},
+checksum:{title:'Internet checksum',trigger:'WORDS → one’s-complement ADD → wrap carry → complement',
+formula:'Checksum = complement(one’s-complement sum)',
+inputs:[['w1','Word 1 (binary)','1010'],['w2','Word 2 (binary)','0110'],['w3','Word 3 (binary)','0011']],
+calc(v){let arr=[v.w1,v.w2,v.w3].map(x=>parseInt(x,2)),m=15,s=0;for(let x of arr){s+=x;if(s>m)s=(s&m)+1}let c=(~s)&m;return {steps:[`Add words using one’s-complement arithmetic`,`Running sum = ${s.toString(2).padStart(4,'0')}`,`Checksum = complement = ${c.toString(2).padStart(4,'0')}`,`Receiver adds data + checksum → all 1s if valid`],ans:`Checksum = ${c.toString(2).padStart(4,'0')}`}},
+trap:'Wrap the carry around to the right before complementing.'},
+hamming:{title:'Hamming distance',trigger:'XOR → COUNT ONES → minimum pairwise distance',
+formula:'dmin≥s+1 detects s · dmin≥2t+1 corrects t',
+inputs:[['a','Codeword A','0000'],['b','Codeword B','0111'],['c','Codeword C','1011'],['d','Codeword D','1100']],
+calc(v){let x=[v.a,v.b,v.c,v.d],rows=[],mn=99;for(let i=0;i<x.length;i++)for(let j=i+1;j<x.length;j++){let d=[...x[i]].filter((z,k)=>z!==x[j][k]).length;rows.push(`d(${x[i]},${x[j]}) = ${d}`);mn=Math.min(mn,d)}return {steps:[...rows,`dmin = ${mn}`,`Detect up to dmin−1 = ${mn-1} errors`,`Correct up to floor((dmin−1)/2) = ${Math.floor((mn-1)/2)} error(s)`],ans:`dmin=${mn} · detect ${mn-1} · correct ${Math.floor((mn-1)/2)}`}},
+trap:'Detection and correction use different formulas.'},
+csma:{title:'CSMA/CD minimum frame',trigger:'COLLISION RETURN → round trip 2Tp',
+formula:'Tp=d/v · Tfr≥2Tp · frame bits=bit rate×2Tp',
+inputs:[['d','Network length (m)',2000],['v','Propagation speed (m/s)',200000000],['rate','Bit rate (bps)',10000000]],
+calc(v){let tp=v.d/v.v,tf=2*tp,sz=v.rate*tf;return {steps:[`Tp = ${v.d}/${v.v} = ${tp.toExponential(3)} s`,`Tfr ≥ 2Tp = ${tf.toExponential(3)} s`,`Frame size = ${v.rate}×${tf} = ${sz} bits = ${sz/8} bytes`],ans:`Minimum frame = ${sz} bits (${sz/8} bytes)`}},
+trap:'CSMA/CD needs the sender transmitting when the collision returns: ROUND TRIP.'},
+ethernet:{title:'Ethernet slot time / length / efficiency',trigger:'512-BIT SLOT → time → max length',
+formula:'Tslot=512/R · MaxLength=vTslot/2 · η=1/(1+6.4a)',
+inputs:[['R','Bit rate (bps)',10000000],['v','Propagation speed (m/s)',200000000],['L','Network length (m)',2500],['F','Frame size (bits)',8000]],
+calc(v){let ts=512/v.R,tp=v.L/v.v,tf=v.F/v.R,a=tp/tf,e=1/(1+6.4*a),ml=v.v*ts/2;return {steps:[`Slot time = 512/${v.R} = ${ts.toExponential(3)} s`,`Max length from slot = v×Tslot/2 = ${ml} m`,`a = Tp/Tfr = ${a.toFixed(4)}`,`Efficiency = 1/(1+6.4a) = ${e.toFixed(4)} (${(e*100).toFixed(2)}%)`],ans:`slot=${ts.toExponential(3)} s · max length=${ml} m · efficiency=${(e*100).toFixed(2)}%`}},
+trap:'Divide by 2 because 512-bit slot time covers the round trip.'},
+sw:{title:'Stop-and-Wait / sliding window',trigger:'Tp/Tt → a → utilization; m bits → window size',
+formula:'U=1/(1+2a) · pipelined U=min(1,N/(1+2a)) · GBN=2^m−1 · SR=2^(m−1)',
+inputs:[['d','Distance (m)',1000],['v','Speed (m/s)',200000000],['F','Frame size (bits)',1000],['R','Bandwidth (bps)',1000000],['N','Window size',3],['m','Sequence bits',3]],
+calc(v){let tt=v.F/v.R,tp=v.d/v.v,a=tp/tt,u=Math.min(1,v.N/(1+2*a));return {steps:[`Tt = ${v.F}/${v.R} = ${tt.toExponential(3)} s`,`Tp = ${v.d}/${v.v} = ${tp.toExponential(3)} s`,`a = Tp/Tt = ${a.toFixed(4)}`,`Stop-and-Wait U = 1/(1+2a) = ${(1/(1+2*a)).toFixed(4)}`,`Window ${v.N}: U = min(1, N/(1+2a)) = ${u.toFixed(4)}`,`GBN max window = 2^${v.m}−1 = ${2**v.m-1}`,`SR max window = 2^(${v.m}−1) = ${2**(v.m-1)}`],ans:`SW U=${(1/(1+2*a)).toFixed(4)} · window U=${u.toFixed(4)} · GBN=${2**v.m-1} · SR=${2**(v.m-1)}`}},
+trap:'RTT = 2Tp. GBN and SR window formulas are different.'}
+};
+
+function setMode(m,el){mode=m;document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));el.classList.add('active');render()}
+function selectTopic(k){current=k;step=0;render()}
+function renderTopics(){document.getElementById('topics').innerHTML='<b>Topics</b>'+topics.map(([k,n])=>`<button class="${k===current?'active':''}" onclick="selectTopic('${k}')">${n}</button>`).join('')}
+function render(){renderTopics();if(mode==='learn'){document.getElementById('drill').classList.add('hidden');document.getElementById('content').classList.remove('hidden');renderLearn()}else{document.getElementById('content').classList.add('hidden');document.getElementById('drill').classList.remove('hidden');renderDrill()}}
+function renderLearn(){let x=data[current];let fields=x.inputs.map(([k,l,val])=>`<div><label>${l}</label><input id="i_${k}" value="${val}"></div>`).join('');document.getElementById('content').innerHTML=`<h2>${x.title}</h2><div class="tiny">🚦 Trigger: ${x.trigger}</div><div class="formula">${x.formula}</div><div class="row">${fields}</div><div class="bar"><button onclick="solve()">▶ Solve</button><button onclick="randomize()">🎲 Randomize</button><button onclick="resetSteps()">↺ Reset</button></div><div id="result"></div>`}
+function solve(){let x=data[current],v={};x.inputs.forEach(([k,l,val])=>{let z=document.getElementById('i_'+k);v[k]=isNaN(Number(z.value))?z.value:Number(z.value)});let r=x.calc(v);document.getElementById('result').innerHTML=`<h3>Mechanics</h3>${r.steps.map((s,i)=>`<div class="step ${i===0?'hot':''}">${i+1}. ${s}</div>`).join('')}<div class="answer"><b>Answer:</b> ${r.ans}</div><p class="warn">⚠ Trap: ${x.trap}</p>`}
+function randomize(){let x=data[current];x.inputs.forEach(([k,l,val])=>{let z=document.getElementById('i_'+k);let n=typeof val==='number';if(!n)return;let choices={R:[10000,20000,50000,100000,800000],B:[10000,20000,30000,50000],L:[2,4,8,16,64,256],db:[10,15,20,30],d:[1000,2000,5000],v:[200000000],bits:[8000,12000,120000],rate:[1000000,10000000],f:[2000,4000,8000],N:[1000,2000,4000,8000],g:[5000,10000,20000],n:[3,4,5,6],F:[512,1000,8000],df:[25,50,100],m:[3,4,5],w1:[5,10,12],w2:[3,6,9],w3:[2,4,7]};if(choices[k])z.value=choices[k][Math.floor(Math.random()*choices[k].length)]});solve()}
+function resetSteps(){document.getElementById('result').innerHTML=''}
+function renderDrill(){let x=data[current];document.getElementById('drill').innerHTML=`<h2>🎯 Drill: ${x.title}</h2><div class="tiny">First identify the trigger. Then write the formula. Only then calculate.</div><div class="formula">${x.formula}</div><div id="dq" class="card" style="margin-top:12px;background:#0e1714"></div>`;newDrill()}
+function newDrill(){let x=data[current];let q=makeQ(current);document.getElementById('dq').innerHTML=`<b>${q.q}</b><div id="hint" class="tiny" style="margin-top:10px">Don't peek. Say the trigger + formula out loud first.</div><div class="bar"><button onclick="showAnswer()">Show solution</button><button onclick="newDrill()">New question</button><button onclick="mark(true)">✓ Got it</button><button onclick="mark(false)">✗ Missed</button></div><div id="sol"></div>`;window.dq=q}
+function makeQ(k){if(k==='nyquist'){let B=[10,20,40][Math.floor(Math.random()*3)]*1000,L=[4,8,16,32][Math.floor(Math.random()*4)];return {q:`A noiseless channel has bandwidth ${B/1000} kHz and ${L} signal levels. Find the maximum bit rate.`,a:data[k].calc({B,L})}}
+if(k==='shannon'){let B=20e3,db=[10,20,30][Math.floor(Math.random()*3)];return {q:`A noisy ${B/1000} kHz channel has SNR ${db} dB. Find capacity.`,a:data[k].calc({B,db})}}
+if(k==='fdm'){let n=3+Math.floor(Math.random()*3),B=50e3,g=5e3;return {q:`${n} channels each use ${B/1000} kHz, with ${g/1000} kHz guard bands. Find link bandwidth.`,a:data[k].calc({n,B,g})}}
+if(k==='csma'){let d=[1000,2000,2500][Math.floor(Math.random()*3)],rate=10e6;return {q:`A ${d} m CSMA/CD link runs at ${rate/1e6} Mbps. Propagation speed is 2×10⁸ m/s. Find minimum frame size.`,a:data[k].calc({d,v:2e8,rate})}}
+return {q:`Use the ${data[k].title} rule to solve a fresh numerical. Click “Learn” if you want the guided version.`,a:null}}
+function showAnswer(){let a=dq.a;document.getElementById('sol').innerHTML=a?`<div class="answer">${a.steps.map((s,i)=>`<div class="step">${i+1}. ${s}</div>`).join('')}<b>Answer: ${a.ans}</b></div>`:`<div class="answer">Switch to Learn mode for an interactive worked example of this topic.</div>`}
+function mark(ok){if(ok){streak++;if(streak>=2){document.getElementById('hint').textContent='🔥 2 in a row — move to the next topic or keep drilling.';streak=0}else document.getElementById('hint').textContent='✓ Good. One more correct in a row advances you.'}else{streak=0;document.getElementById('hint').textContent='↺ Reset streak. Do one more, but say the trigger before touching the formula.'}}
+render();
+</script>
+</body>
+</html>
