@@ -1,0 +1,344 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>DCN Field Manual — Exam Drill</title><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"><style>
+:root{
+  --bg:#12151a;
+  --surface:#1a1f27;
+  --surface2:#20262f;
+  --line:#2b323d;
+  --text:#e9ecf1;
+  --muted:#8b93a3;
+  --accent:#ffb454;
+  --accent-dim:#5a4a2c;
+  --good:#4fd88a;
+  --bad:#ff6b6b;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'IBM Plex Sans', system-ui, sans-serif;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--sans);-webkit-tap-highlight-color:transparent;}
+body{padding-bottom:64px;}
+h1,h2,h3{font-family:var(--sans);margin:0;}
+.wrap{max-width:640px;margin:0 auto;padding:0 14px;}
+
+/* header */
+header.top{position:sticky;top:0;z-index:20;background:rgba(18,21,26,0.96);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);}
+.headline{padding:14px 14px 10px;}
+.headline h1{font-size:17px;font-weight:700;letter-spacing:0.2px;}
+.headline p{margin:3px 0 0;color:var(--muted);font-size:12.5px;line-height:1.4;}
+.groups{display:flex;gap:6px;padding:0 14px 10px;overflow-x:auto;scrollbar-width:none;}
+.groups::-webkit-scrollbar{display:none;}
+.grp-btn{flex:0 0 auto;padding:7px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--muted);font-size:12.5px;font-weight:600;font-family:var(--sans);white-space:nowrap;}
+.grp-btn.active{background:var(--accent);border-color:var(--accent);color:#231a08;}
+.chips{display:flex;gap:6px;padding:0 14px 12px;overflow-x:auto;scrollbar-width:none;}
+.chips::-webkit-scrollbar{display:none;}
+.chip{flex:0 0 auto;padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--text);font-size:12px;font-family:var(--mono);white-space:nowrap;}
+.chip.active{background:var(--surface2);border-color:var(--accent);color:var(--accent);}
+
+/* content */
+main{padding:14px 0 30px;}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px;}
+.card h2{font-size:14px;text-transform:uppercase;letter-spacing:0.4px;color:var(--accent);margin-bottom:10px;}
+.card h2 .co{color:var(--muted);font-family:var(--mono);font-size:11px;text-transform:none;letter-spacing:0;margin-left:6px;}
+.topic-title{font-size:19px;font-weight:700;margin:2px 0 12px;line-height:1.3;}
+
+ol.steps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;}
+ol.steps li{font-size:14px;line-height:1.5;padding-left:2px;}
+ol.steps li b{color:var(--text);}
+ol.steps.hidden li{color:transparent;background:var(--surface2);border-radius:4px;user-select:none;}
+ol.steps.hidden li::selection{background:transparent;}
+
+.trap{background:#241717;border:1px solid #4a2626;border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.5;color:#ffb3b3;}
+.trap b{color:var(--bad);}
+
+.recall-toggle{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 11px;border-radius:8px;border:1px solid var(--line);background:var(--surface2);color:var(--muted);font-size:12px;font-family:var(--mono);}
+
+/* drill */
+.drill-box{margin-top:4px;}
+.problem{background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:12px;font-family:var(--mono);font-size:13.5px;line-height:1.6;white-space:pre-wrap;word-break:break-word;}
+.btnrow{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+button.act{border:none;border-radius:8px;padding:10px 14px;font-family:var(--sans);font-weight:600;font-size:13px;background:var(--surface2);color:var(--text);border:1px solid var(--line);}
+button.act.primary{background:var(--accent);color:#231a08;border-color:var(--accent);}
+button.act.good{background:var(--good);color:#0b2015;}
+button.act.bad{background:var(--bad);color:#2a0b0b;}
+.solution{margin-top:10px;display:none;}
+.solution.show{display:block;}
+.solution pre{margin:0;background:#0e1116;border:1px solid var(--line);border-radius:8px;padding:10px;font-family:var(--mono);font-size:12.5px;line-height:1.55;overflow-x:auto;white-space:pre-wrap;}
+
+/* mcq */
+.mcq-q{font-size:14.5px;line-height:1.5;margin-bottom:10px;}
+.opt{display:block;width:100%;text-align:left;padding:10px 12px;border-radius:9px;border:1px solid var(--line);background:var(--surface2);color:var(--text);font-family:var(--sans);font-size:13.5px;margin-bottom:8px;}
+.opt.correct{border-color:var(--good);background:#122019;color:var(--good);}
+.opt.wrong{border-color:var(--bad);background:#241010;color:var(--bad);}
+.explain{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.5;display:none;}
+.explain.show{display:block;}
+.progress-mini{font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:8px;}
+
+/* multi-select lagrange */
+.msel{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0;}
+.msel button{padding:9px 13px;border-radius:8px;border:1px solid var(--line);background:var(--surface2);color:var(--text);font-family:var(--mono);font-size:13.5px;}
+.msel button.picked{border-color:var(--accent);color:var(--accent);}
+
+/* footer stats */
+footer.stats{position:fixed;bottom:0;left:0;right:0;background:rgba(18,21,26,0.97);backdrop-filter:blur(6px);border-top:1px solid var(--line);padding:9px 14px;display:flex;justify-content:space-between;align-items:center;z-index:20;}
+.stat{font-family:var(--mono);font-size:12px;color:var(--muted);}
+.stat b{color:var(--text);}
+.stat.streak b{color:var(--accent);}
+.resetbtn{font-family:var(--mono);font-size:11px;color:var(--muted);background:none;border:1px solid var(--line);border-radius:6px;padding:5px 8px;}
+
+.newp{margin-top:8px;}
+label.small{display:block;font-size:11.5px;color:var(--muted);margin:8px 0 4px;}
+input.ansinput{width:100%;background:#0e1116;border:1px solid var(--line);border-radius:8px;padding:9px 10px;color:var(--text);font-family:var(--mono);font-size:13.5px;}
+body{padding-top:env(safe-area-inset-top,0px)}
+</style></head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="headline">
+      <h1>DCN Field Manual</h1>
+      <p>14 topics · CO1–CO5. Memorise the moves, then drill calculations and exam-style concept checks. Randomised problems never repeat.</p>
+    </div>
+    <div class="groups" id="groups"></div>
+    <div class="chips" id="chips"></div>
+  </div>
+</header>
+
+<main class="wrap" id="main"></main>
+
+<footer class="stats">
+  <span class="stat">accuracy <b id="acc">—</b></span>
+  <span class="stat streak">streak <b id="streak">0</b></span>
+  <span class="stat">done <b id="done">0</b></span>
+  <button class="resetbtn" id="resetStats">reset</button>
+</footer>
+
+<script>
+/* ---------- utilities ---------- */
+const $ = (s,el=document)=>el.querySelector(s);
+const $$ = (s,el=document)=>[...el.querySelectorAll(s)];
+function randInt(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+function shuffle(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b];}return a;}
+
+/* ---------- score state ---------- */
+let stats={correct:0,total:0,streak:0};try{stats=JSON.parse(localStorage.getItem('dcn_stats'))||stats}catch(e){}
+function saveStats(){try{localStorage.setItem('dcn_stats', JSON.stringify(stats))}catch(e){}renderStats();}
+function renderStats(){
+  $('#acc').textContent = stats.total? Math.round(100*stats.correct/stats.total)+'%' : '—';
+  $('#streak').textContent = stats.streak;
+  $('#done').textContent = stats.total;
+}
+function grade(isCorrect){
+  stats.total++;
+  if(isCorrect){stats.correct++; stats.streak++;} else {stats.streak=0;}
+  saveStats();
+}
+$('#resetStats').onclick = ()=>{stats={correct:0,total:0,streak:0}; saveStats();};
+renderStats();
+
+/* ---------- topic data ---------- */
+const TOPICS = [
+{id:'t1',grp:'Physical',co:'CO1',title:'Signals, Nyquist & Shannon capacity',
+ steps:['<b>Noiseless (Nyquist):</b> C = 2·B·log₂L bps (L = signal levels). Binary: C = 2B.','<b>Noisy (Shannon):</b> C = B·log₂(1+SNR). SNR must be a <b>ratio</b>; SNR(dB) = 10·log₁₀(ratio).','Real limit = <b>min</b> of the two. Use Shannon for the cap, then Nyquist to pick levels.','Bandwidth in Hz, answer in bps. Attenuation, distortion, noise = the three impairments.'],
+ trap:'<b>Trap:</b> plugging dB straight into log₂(1+SNR). Convert first: 30 dB → 1000, 20 dB → 100, 10 dB → 10.',
+ mcq:[{q:'Shannon capacity depends on:',opts:['Bandwidth and number of levels','Bandwidth and SNR','Only bandwidth','Baud rate and levels'],a:1,e:'C = B·log₂(1+SNR). Levels belong to Nyquist.'},{q:'SNR of 30 dB as a ratio is:',opts:['30','300','1000','3'],a:2,e:'10^(30/10) = 1000.'},{q:'Doubling bandwidth in the noiseless channel (same L) does what to capacity?',opts:['Halves it','Doubles it','No change','Squares it'],a:1,e:'C = 2B·log₂L is linear in B.'}],
+ gen:['shannon','nyquist']},
+{id:'t2',grp:'Physical',co:'CO1',title:'Line coding, modulation, multiplexing, media',
+ steps:['<b>NRZ-L:</b> level = bit. <b>NRZ-I:</b> 1 = transition, 0 = none. Both lose sync on long runs.','<b>Manchester:</b> mid-bit transition always; low→high = 1, high→low = 0 (IEEE; Forouzan). <b>Diff. Manchester:</b> mid-bit transition always for clock; <b>start-of-bit transition = 0</b>, none = 1.','Manchester needs 2× bandwidth (self-clocking). AMI/bipolar: 0 = zero, 1s alternate +/−.','<b>Modulation:</b> ASK (amplitude), FSK (freq), PSK (phase), QAM (amp+phase). Baud rate = bit rate / bits per symbol.','<b>FDM</b> analog, frequency bands + guard bands · <b>TDM</b> digital time slots (sync/stat) · <b>WDM</b> light.','<b>Media:</b> twisted pair (UTP/STP), coax, fibre (best, immune to EMI), wireless.'],
+ trap:'<b>Trap:</b> Differential Manchester — a transition at the <b>start</b> means 0. The mid-bit transition carries no data, only clock.',
+ mcq:[{q:'Self-synchronising codes among these:',opts:['NRZ-L','NRZ-I','Manchester','Unipolar'],a:2,e:'Manchester has a transition in every bit.'},{q:'Bit rate 4800 bps with 16-QAM (4 bits/symbol). Baud rate:',opts:['4800','1200','19200','300'],a:1,e:'Baud = 4800/4 = 1200.'},{q:'Manchester needs bandwidth that is, relative to NRZ:',opts:['Half','Same','Double','Quarter'],a:2,e:'Two signal changes per bit.'},{q:'Multiplexing of digital signals by time slots:',opts:['FDM','TDM','WDM','CDM only'],a:1,e:'TDM shares a link in time.'}]},
+{id:'t3',grp:'Datalink',co:'CO1/2',title:'Layered architecture, topology, devices',
+ steps:['<b>OSI (7):</b> Physical, Data link, Network, Transport, Session, Presentation, Application. <b>TCP/IP (4–5):</b> Host-to-net, Internet, Transport, Application.','Units: bits · frames · packets/datagrams · segments · messages.','Devices by layer: <b>hub/repeater L1</b>, <b>bridge/switch L2</b> (separates collision domains), <b>router L3</b> (separates broadcast domains), gateway L7.','Topologies: bus, star, ring, mesh (n(n−1)/2 links), tree.'],
+ trap:'<b>Trap:</b> a switch splits <i>collision</i> domains, not broadcast domains. Only a router (or VLAN) splits broadcast domains.',
+ mcq:[{q:'A full mesh of 8 devices needs how many links?',opts:['8','16','28','56'],a:2,e:'8·7/2 = 28.'},{q:'The PDU at the transport layer is called:',opts:['Frame','Packet','Segment','Bit'],a:2,e:'TCP segment / UDP datagram.'},{q:'Which device operates at the network layer?',opts:['Hub','Switch','Router','Repeater'],a:2,e:'Routers forward on IP addresses.'},{q:'Which layer handles routing and logical addressing?',opts:['Data link','Network','Transport','Session'],a:1,e:'Network layer, IP.'}]},
+{id:'t4',grp:'Datalink',co:'CO2',title:'Error detection: parity, CRC, checksum',
+ steps:['<b>CRC:</b> append (r) zeros to data, r = degree of generator (generator has r+1 bits).','Divide with <b>XOR</b> (no borrows). Remainder (r bits) replaces the zeros → codeword.','Receiver divides codeword by same generator: <b>remainder 0 = accept</b>.','<b>Checksum:</b> sum 16-bit words with end-around carry, <b>complement</b>. Receiver sums everything incl. checksum → all 1s (complement = 0) = OK.','Parity: even parity makes the count of 1s even; single bit only. 2D parity catches more.'],
+ trap:'<b>Trap:</b> forgetting to append r zeros before dividing, or writing the remainder shorter than r bits. Pad with leading zeros to exactly r bits.',
+ mcq:[{q:'Generator 1011 (x³+x+1). Zeros appended to data:',opts:['2','3','4','1'],a:1,e:'Degree 3, so 3 zeros.'},{q:'Receiver gets a codeword and the CRC remainder is nonzero. It:',opts:['Accepts','Detects an error','Corrects it','Ignores it'],a:1,e:'CRC detects only.'},{q:'A single even-parity bit detects:',opts:['Any 2-bit error','All odd-count bit errors','All burst errors','Nothing'],a:1,e:'Odd number of flipped bits changes parity.'}],
+ gen:['crc']},
+{id:'t5',grp:'Datalink',co:'CO2',title:'Hamming code',
+ steps:['Need r parity bits with <b>2ʳ ≥ m + r + 1</b> (m data bits).','Parity bits sit at positions <b>1, 2, 4, 8…</b>; data fills the rest.','Parity bit at position 2ᵏ covers every position whose binary index has bit k set.','Receiver recomputes each parity; the failing checks written as binary (P8 P4 P2 P1) = <b>position of the flipped bit</b>. 0 = no error.','Min Hamming distance d: detects d−1 errors, corrects ⌊(d−1)/2⌋.'],
+ trap:'<b>Trap:</b> counting syndrome bits in the wrong order. P1 is the least significant bit of the error position.',
+ mcq:[{q:'Min distance 5 can correct how many errors?',opts:['1','2','3','4'],a:1,e:'⌊(5−1)/2⌋ = 2.'},{q:'Syndrome P4 P2 P1 = 1 0 1 means error at position:',opts:['3','4','5','6'],a:2,e:'101₂ = 5.'},{q:'Position 6 (110) is checked by parity bits:',opts:['P1,P2','P2,P4','P1,P4','P1,P2,P4'],a:1,e:'6 = 4+2.'}],
+ gen:['hamming']},
+{id:'t6',grp:'Datalink',co:'CO2',title:'Flow control: Stop-and-Wait, GBN, SR',
+ steps:['<b>Tf</b> = L/B, <b>Tp</b> = distance/speed. <b>Stop-and-wait:</b> U = Tf / (Tf + 2Tp).','<b>Sliding window:</b> U = N·Tf / (Tf + 2Tp), capped at 1. Window for full use: N = 1 + 2Tp/Tf.','<b>Go-Back-N:</b> sender window up to 2ᵐ−1, receiver window 1; one error → resend that frame and all after.','<b>Selective Repeat:</b> sender and receiver windows each 2ᵐ⁻¹; only the lost frame is resent.','Sequence bits needed: GBN ≥ N+1 numbers; SR ≥ 2N numbers.'],
+ trap:'<b>Trap:</b> GBN max window is 2ᵐ−1, not 2ᵐ. SR max window is 2ᵐ⁻¹. Mixing them up is the classic mark loss.',
+ mcq:[{q:'m = 3 sequence bits. Max GBN sender window:',opts:['3','4','7','8'],a:2,e:'2³−1 = 7.'},{q:'m = 3 sequence bits. Max SR window:',opts:['3','4','7','8'],a:1,e:'2²= 4.'},{q:'Which discards out-of-order frames at the receiver?',opts:['Stop-and-wait only','Go-Back-N','Selective Repeat','None'],a:1,e:'GBN receiver window is 1.'}],
+ gen:['sw','window']},
+{id:'t7',grp:'Datalink',co:'CO2',title:'CSMA/CD & Ethernet frame',
+ steps:['CSMA/CD: listen, send if idle, <b>keep listening</b>, on collision send jam, <b>binary exponential backoff</b>: wait K × slot time, K random in [0, 2ⁿ−1].','<b>Min frame time ≥ 2Tp</b> → min frame bits = 2·Tp·B. Slot time = 512 bit times on 10 Mbps.','Ethernet frame: Preamble 7B · SFD 1B · Dest 6B · Src 6B · Type/Len 2B · Data 46–1500B · FCS 4B. Min frame 64B, max 1518B (excl. preamble).','Efficiency ≈ 1 / (1 + 6.44a), a = Tp/Tf.'],
+ trap:'<b>Trap:</b> min frame size uses <b>round-trip</b> (2Tp), not one-way. Also, the 64 B minimum excludes preamble and SFD.',
+ mcq:[{q:'Ethernet maximum data field:',opts:['46 B','64 B','1500 B','1518 B'],a:2,e:'1518 is the whole frame; payload is 1500.'},{q:'After the 3rd collision, K is chosen from:',opts:['0..3','0..7','0..2','0..15'],a:1,e:'0..2ⁿ−1 = 0..7.'},{q:'Min frame size exists so that:',opts:['Sender is still transmitting when collision news returns','Preamble fits','Switches can cope','CRC works'],a:0,e:'Frame time must exceed round-trip.'}],
+ gen:['csma']},
+{id:'t8',grp:'Network',co:'CO3',title:'IPv4 addressing: classful, classless, special',
+ steps:['<b>Classes by first octet:</b> A 0–127 (/8) · B 128–191 (/16) · C 192–223 (/24) · D 224–239 multicast · E 240–255.','<b>Network</b> = IP AND mask. <b>Broadcast</b> = host bits all 1. <b>Usable hosts</b> = 2^(32−p) − 2.','Special: 0.0.0.0 (this host), 127.x loopback, 255.255.255.255 limited broadcast, private 10/8, 172.16/12, 192.168/16, 169.254/16 APIPA.','CIDR a.b.c.d/p: block size = 2^(32−p); a block must start on a multiple of its size.'],
+ trap:'<b>Trap:</b> 127.x.x.x is class A by first octet but reserved for loopback. Also, hosts = 2ⁿ−2 (not 2ⁿ).',
+ mcq:[{q:'130.5.6.7 belongs to class:',opts:['A','B','C','D'],a:1,e:'128–191 → B.'},{q:'Usable hosts in a /26:',opts:['64','62','30','126'],a:1,e:'2⁶−2 = 62.'},{q:'172.20.1.1 is:',opts:['Public','Private','Multicast','Loopback'],a:1,e:'172.16–172.31 is private.'}],
+ gen:['ipnet','hosts']},
+{id:'t9',grp:'Network',co:'CO3',title:'Subnetting & VLSM',
+ steps:['For N equal subnets: borrow <b>b = ⌈log₂N⌉</b> bits. New prefix = old + b.','Subnet block size = 2^(32−new prefix); successive subnets start at multiples of it.','<b>VLSM:</b> sort requirements <b>largest first</b>; size each as the smallest power of 2 ≥ (hosts+2); allocate contiguously.','Mask in last octet: /25=128, /26=192, /27=224, /28=240, /29=248, /30=252.'],
+ trap:'<b>Trap:</b> allocating the small subnet first in VLSM breaks alignment. Largest first, always. And add 2 for network + broadcast before rounding up.',
+ mcq:[{q:'Need 50 hosts per subnet. Smallest prefix that works:',opts:['/25','/26','/27','/28'],a:1,e:'50+2 = 52 → 64 → 6 host bits → /26.'},{q:'/27 subnet mask:',opts:['255.255.255.192','255.255.255.224','255.255.255.240','255.255.255.248'],a:1,e:'3 borrowed bits in last octet = 224.'},{q:'In VLSM, you assign addresses starting with the:',opts:['Smallest requirement','Largest requirement','Alphabetical order','Random'],a:1,e:'Keeps blocks aligned.'}],
+ gen:['subnets','hostbits']},
+{id:'t10',grp:'Network',co:'CO3',title:'IP datagram, fragmentation, ARP, ICMP, NAT, IPv6',
+ steps:['Header 20 B min (IHL×4). Fields: Ver, IHL, ToS, Total length, ID, flags (DF, MF), <b>offset (units of 8 B)</b>, TTL, Protocol, Checksum.','<b>Fragmenting:</b> data per fragment = ⌊(MTU−20)/8⌋×8 (except last). Offset = bytes before / 8. MF=1 on all but last.','<b>ARP:</b> IP → MAC (broadcast request, unicast reply). <b>ICMP:</b> error/query messages (echo, dest unreachable, time exceeded, redirect).','<b>NAT:</b> private↔public mapping; PAT uses ports.','<b>IPv6:</b> 128-bit, 8 groups of 4 hex. Drop leading zeros; one <b>::</b> replaces the longest run of zero groups. Fixed 40 B header, no checksum, no router fragmentation.'],
+ trap:'<b>Trap:</b> fragment data must be a multiple of 8 (except the last), and offset is divided by 8. Also, total length includes the 20 B header, so subtract it first.',
+ mcq:[{q:'In IPv6, :: may appear:',opts:['Any number of times','At most once','Only at the start','Never'],a:1,e:'Twice would be ambiguous.'},{q:'ARP resolves:',opts:['MAC to IP','IP to MAC','Name to IP','Port to IP'],a:1,e:'IP→MAC; RARP did the reverse.'},{q:'TTL expiry triggers which ICMP message?',opts:['Echo reply','Time exceeded','Redirect','Source quench'],a:1,e:'Router discards and sends Time Exceeded.'},{q:'IPv6 removed which IPv4 header field?',opts:['TTL','Checksum','Source address','Version'],a:1,e:'Hop limit replaces TTL; checksum dropped.'}],
+ gen:['frag','fragoff']},
+{id:'t11',grp:'Network',co:'CO3',title:'Routing: distance vector, link state, RIP/OSPF/BGP',
+ steps:['<b>Distance vector (Bellman–Ford):</b> each node shares its table with neighbours; D(x) = min over neighbours of cost + neighbour&apos;s D. Count-to-infinity problem → split horizon, poison reverse.','<b>Link state (Dijkstra):</b> flood link states to all, each builds the full map, runs Dijkstra.','<b>RIP</b> (DV, hop count, max 15, UDP 520) · <b>OSPF</b> (LS, cost, areas, IP protocol 89) · <b>BGP</b> (path vector, inter-AS, TCP 179).','Intra-AS = IGP (RIP, OSPF); inter-AS = EGP (BGP).'],
+ trap:'<b>Trap:</b> RIP hop 16 = infinity, so max usable is 15. And OSPF floods to <i>all</i> routers in the area; DV only talks to neighbours.',
+ mcq:[{q:'Which uses Dijkstra?',opts:['RIP','OSPF','BGP','ARP'],a:1,e:'Link state.'},{q:'RIP metric is:',opts:['Bandwidth','Delay','Hop count','Cost by speed'],a:2,e:'Hops, max 15.'},{q:'Split horizon addresses:',opts:['Loops in switches','Count-to-infinity','Fragmentation','NAT'],a:1,e:'Never advertise a route back where it was learned.'},{q:'Inter-AS routing protocol:',opts:['OSPF','RIP','BGP','IGRP'],a:2,e:'BGP, path vector.'}]},
+{id:'t12',grp:'Transport',co:'CO4',title:'TCP: connection, segment, flow & error control',
+ steps:['<b>3-way handshake:</b> SYN(seq=x) → SYN+ACK(seq=y, ack=x+1) → ACK(ack=y+1). SYN and FIN each consume 1 sequence number. Close = 4-way FIN/ACK.','<b>ACK number</b> = next byte expected = seq + data bytes.','<b>Flow control:</b> receiver advertises rwnd; sender window = min(rwnd, cwnd). Zero window → persistence timer.','<b>Error control:</b> cumulative ACK, retransmit on timeout or <b>3 duplicate ACKs</b> (fast retransmit).','Header 20–60 B; flags URG ACK PSH RST SYN FIN. <b>UDP:</b> 8 B header (ports, length, checksum), connectionless, unreliable.','Timers: retransmission (RTO from RTT), persistence, keepalive, time-wait (2·MSL).'],
+ trap:'<b>Trap:</b> ACK = seq + bytes of data, but a pure SYN or FIN adds 1. And UDP header is 8 B; TCP min is 20 B.',
+ mcq:[{q:'Segment seq=1000 carries 500 bytes. ACK number:',opts:['1000','1500','1501','500'],a:1,e:'Next byte expected: 1500.'},{q:'SYN with seq=200, SYN+ACK carries ack =',opts:['200','201','199','202'],a:1,e:'SYN consumes one number.'},{q:'Fast retransmit triggers after:',opts:['1 duplicate ACK','2 duplicate ACKs','3 duplicate ACKs','A timeout only'],a:2,e:'Three dup ACKs.'},{q:'Which is connectionless with an 8-byte header?',opts:['TCP','UDP','SCTP','ICMP'],a:1,e:'UDP.'}],
+ gen:['ack']},
+{id:'t13',grp:'Transport',co:'CO4',title:'TCP congestion control',
+ steps:['<b>Slow start:</b> cwnd starts at 1 MSS, doubles each RTT until it reaches <b>ssthresh</b>.','<b>Congestion avoidance:</b> +1 MSS per RTT (additive increase).','<b>Timeout:</b> ssthresh = cwnd/2, cwnd = 1, restart slow start (Tahoe/Reno).','<b>3 dup ACKs (Reno):</b> ssthresh = cwnd/2, cwnd = ssthresh (fast recovery), then linear. Tahoe goes to 1.'],
+ trap:'<b>Trap:</b> ssthresh is half of the cwnd <i>at the moment of loss</i>, not half of the old ssthresh. And at the transition, cwnd is capped at ssthresh, it does not jump past it.',
+ mcq:[{q:'On timeout with cwnd = 20, new ssthresh and cwnd:',opts:['20 and 1','10 and 1','10 and 10','20 and 10'],a:1,e:'ssthresh=cwnd/2; cwnd=1.'},{q:'Reno on 3 dup ACKs with cwnd = 16:',opts:['cwnd=1','cwnd=8, linear growth','cwnd=16','cwnd=32'],a:1,e:'Fast recovery halves, no slow start.'},{q:'Slow start growth is:',opts:['Linear','Exponential per RTT','Constant','Random'],a:1,e:'Doubles each RTT.'}],
+ gen:['cwnd']},
+{id:'t14',grp:'Application',co:'CO5',title:'DNS, DHCP, HTTP',
+ steps:['<b>DNS:</b> hierarchical (root → TLD → authoritative). UDP port 53 (TCP for zone transfer). Iterative vs recursive queries. Records: A, AAAA, NS, MX, CNAME, PTR.','<b>DHCP</b> (UDP 67/68): <b>DORA</b> — Discover, Offer, Request, Acknowledge. Gives IP, mask, gateway, DNS, lease.','<b>HTTP</b> (TCP 80; HTTPS 443): request line + headers + body. Methods GET, POST, PUT, DELETE, HEAD. Status 1xx info, 2xx OK, 3xx redirect, 4xx client error, 5xx server error.','HTTP/1.0 non-persistent: 2 RTT per object. 1.1 persistent + pipelining. Cookies add state.'],
+ trap:'<b>Trap:</b> DHCP Discover is a broadcast from 0.0.0.0 to 255.255.255.255. DNS is UDP normally. HTTP itself is stateless.',
+ mcq:[{q:'DHCP message order:',opts:['Offer, Discover, Request, Ack','Discover, Offer, Request, Ack','Request, Offer, Discover, Ack','Discover, Request, Offer, Ack'],a:1,e:'DORA.'},{q:'404 means:',opts:['Server error','Redirect','Not found','Forbidden'],a:2,e:'Client error: resource not found.'},{q:'MX record gives:',opts:['IPv6 address','Mail server','Alias','Name server'],a:1,e:'Mail exchanger.'},{q:'DNS query normally uses:',opts:['TCP 53','UDP 53','UDP 67','TCP 80'],a:1,e:'UDP 53.'}]}
+];
+const GROUPS=['Physical','Datalink','Network','Transport','Application'];
+const GROUP_LABEL={Physical:'Physical (CO1)',Datalink:'Data Link (CO2)',Network:'Network (CO3)',Transport:'Transport (CO4)',Application:'Application (CO5)'};
+/* ---------- numeric drill generators: return {q, ans, sol, tol?} ---------- */
+const pick=a=>a[randInt(0,a.length-1)];
+function crcRem(d,g){let a=(d+'0'.repeat(g.length-1)).split('').map(Number);const G=g.split('').map(Number);for(let i=0;i<d.length;i++){if(a[i]){for(let j=0;j<G.length;j++)a[i+j]^=G[j];}}return a.slice(d.length).join('');}
+const ipS=o=>o.join('.');
+const GEN={
+shannon(){const B=pick([1,2,3,4]),s=pick([1,3,7,15,31,63]);const k=Math.log2(1+s);return{q:`Shannon: B = ${B} kHz, SNR = ${s} (ratio). Capacity in kbps?`,ans:B*k,sol:`C = ${B}·log₂(1+${s}) = ${B}·${k} = ${B*k} kbps`}},
+nyquist(){const B=pick([1,2,3,4,5]),L=pick([2,4,8,16]);return{q:`Nyquist (noiseless): B = ${B} kHz, ${L} levels. Max bit rate in kbps?`,ans:2*B*Math.log2(L),sol:`2·${B}·log₂${L} = ${2*B*Math.log2(L)} kbps`}},
+crc(){const g=pick(['1011','101','1101']);let d='';for(let i=0;i<7;i++)d+=randInt(0,1);const r=crcRem(d,g);return{q:`CRC: data ${d}, generator ${g}. Give the remainder (${g.length-1} bits).`,ans:r,sol:`Append ${g.length-1} zeros → ${d+'0'.repeat(g.length-1)}, XOR-divide by ${g} → remainder ${r}. Codeword = ${d+r}.`}},
+hamming(){const m=pick([4,7,8,11,12,16,20,26]);let r=1;while(2**r<m+r+1)r++;return{q:`Hamming: ${m} data bits. Minimum parity bits r?`,ans:r,sol:`Need 2ʳ ≥ ${m}+r+1 → r = ${r} (2^${r}=${2**r} ≥ ${m+r+1}).`}},
+sw(){const a=pick([1,2,4,5]),b=pick([1,2,3,5]);const u=Math.round(1000*a/(a+2*b))/10;return{q:`Stop-and-wait: Tf = ${a} ms, one-way Tp = ${b} ms. Utilisation in % (1 decimal)?`,ans:u,tol:0.11,sol:`U = Tf/(Tf+2Tp) = ${a}/(${a}+${2*b}) = ${u}%`}},
+window(){const a=pick([1,2,4]),b=pick([4,6,10,12]);return{q:`Tf = ${a} ms, one-way Tp = ${b} ms. Window size N for 100% utilisation?`,ans:1+2*b/a,sol:`N = 1 + 2Tp/Tf = 1 + ${2*b}/${a} = ${1+2*b/a}`}},
+csma(){const B=pick([10,100]),T=pick([5,10,20,25]);return{q:`CSMA/CD: ${B} Mbps, one-way propagation ${T} µs. Min frame size in bits?`,ans:2*T*B,sol:`2·Tp·B = 2·${T}µs·${B}Mbps = ${2*T*B} bits (${2*T*B/8} bytes)`}},
+ipnet(){const p=randInt(25,29),x=randInt(1,254),o=[192,168,randInt(1,200),x],bs=2**(32-p),n=Math.floor(x/bs)*bs;return{q:`Network address of ${ipS(o)}/${p}? (a.b.c.d)`,ans:ipS([192,168,o[2],n]),sol:`Block size ${bs}; ${x} falls in block starting at ${n}. Broadcast = ${n+bs-1}.`}},
+hosts(){const p=randInt(20,30);return{q:`Usable hosts in a /${p} network?`,ans:2**(32-p)-2,sol:`2^${32-p} − 2 = ${2**(32-p)-2}`}},
+subnets(){const n=pick([3,5,6,9,12,20]);const b=Math.ceil(Math.log2(n));return{q:`Split a /24 into ${n} equal-size subnets (rounded up to power of 2). New prefix length? (number only)`,ans:24+b,sol:`b = ⌈log₂${n}⌉ = ${b} → /${24+b}`}},
+hostbits(){const h=pick([10,25,50,100,60,14,30]);let b=1;while(2**b<h+2)b++;return{q:`VLSM: a subnet needs ${h} hosts. Smallest prefix length? (number only)`,ans:32-b,sol:`${h}+2 = ${h+2} → 2^${b} = ${2**b} → /${32-b}`}},
+frag(){const L=pick([2020,3020,4020,5020]),M=pick([620,820,1020,1500]);const d=Math.floor((M-20)/8)*8,tot=L-20;return{q:`IP datagram total length ${L} B (20 B header), MTU ${M} B. Number of fragments?`,ans:Math.ceil(tot/d),sol:`Data = ${tot} B; per-fragment max = ⌊(${M}−20)/8⌋·8 = ${d} B → ⌈${tot}/${d}⌉ = ${Math.ceil(tot/d)}`}},
+fragoff(){const L=pick([2020,3020,4020]),M=pick([620,820,1020]);const d=Math.floor((M-20)/8)*8,tot=L-20,n=Math.ceil(tot/d);return{q:`Same setup: total length ${L} B, MTU ${M} B. Fragment offset field of the LAST fragment?`,ans:(n-1)*d/8,sol:`${n} fragments of ${d} B (last smaller). Last offset = ${(n-1)*d}/8 = ${(n-1)*d/8}`}},
+ack(){const s=randInt(1,9)*1000+pick([0,100,200]),n=pick([100,250,500,1000]);return{q:`TCP segment seq = ${s}, carries ${n} bytes. ACK number returned?`,ans:s+n,sol:`ACK = next byte expected = ${s}+${n} = ${s+n}`}},
+cwnd(){const S=pick([8,16,32]),r=randInt(5,9);let c=1,seq=[1];for(let i=1;i<r;i++){c=c<S?Math.min(c*2,S):c+1;seq.push(c)}return{q:`Slow start, ssthresh = ${S} MSS, cwnd = 1 at round 1, no loss. cwnd (MSS) at round ${r}?`,ans:c,sol:`Rounds: ${seq.join(', ')} → round ${r} = ${c}`}}
+};
+function renderGen(t){
+  const area=$('#genArea');let cur;
+  function draw(){
+    cur=GEN[pick(t.gen)]();
+    area.innerHTML=`<div class="problem">${cur.q}</div><label class="small">Your answer</label><input class="ansinput" id="gIn" autocomplete="off"><div class="btnrow"><button class="act primary" id="gChk">Check</button><button class="act" id="gNew">New problem</button></div><div class="solution" id="gSol"></div>`;
+    $('#gNew').onclick=draw;
+    $('#gChk').onclick=()=>{
+      const v=$('#gIn').value.trim().toLowerCase().replace(/\s+/g,'');
+      const ok=typeof cur.ans==='number'?Math.abs(parseFloat(v)-cur.ans)<=(cur.tol||1e-6):v===String(cur.ans).toLowerCase();
+      grade(ok);$('#gChk').disabled=true;
+      const s=$('#gSol');s.classList.add('show');
+      s.innerHTML=`<div style="color:${ok?'var(--good)':'var(--bad)'};font-weight:600;font-size:13px;margin-bottom:6px">${ok?'Correct.':'Answer: '+cur.ans}</div><pre>${cur.sol}</pre>`;
+    };
+    $('#gIn').addEventListener('keydown',e=>{if(e.key==='Enter'&&!$('#gChk').disabled)$('#gChk').click()});
+  }
+  draw();
+}
+let currentGroup = 'Physical';
+let currentTopic = TOPICS[0].id;
+
+/* ---------- nav render ---------- */
+function renderNav(){
+  const g = $('#groups'); g.innerHTML='';
+  GROUPS.forEach(grp=>{
+    const b=document.createElement('button');
+    b.className='grp-btn'+(grp===currentGroup?' active':'');
+    b.textContent=GROUP_LABEL[grp];
+    b.onclick=()=>{currentGroup=grp; currentTopic=TOPICS.find(t=>t.grp===grp).id; renderNav(); renderTopic();};
+    g.appendChild(b);
+  });
+  const c = $('#chips'); c.innerHTML='';
+  TOPICS.filter(t=>t.grp===currentGroup).forEach((t,i)=>{
+    const b=document.createElement('button');
+    b.className='chip'+(t.id===currentTopic?' active':'');
+    b.textContent=(TOPICS.indexOf(t)+1)+'. '+t.title.split(',')[0].split(':')[0].slice(0,24);
+    b.onclick=()=>{currentTopic=t.id; renderNav(); renderTopic();};
+    c.appendChild(b);
+  });
+}
+
+/* ---------- topic render ---------- */
+function renderTopic(){
+  const t = TOPICS.find(x=>x.id===currentTopic);
+  const main = $('#main');
+  main.innerHTML = '';
+
+  const head = document.createElement('div');
+  head.innerHTML = `<div class="topic-title">${TOPICS.indexOf(t)+1}. ${t.title} <span style="color:var(--muted);font-family:var(--mono);font-size:12px;">(${t.co})</span></div>`;
+  main.appendChild(head);
+
+  const stepsCard = document.createElement('div');
+  stepsCard.className='card';
+  stepsCard.innerHTML = `<h2>The moves</h2>
+    <ol class="steps" id="stepsList">${t.steps.map(s=>`<li>${s}</li>`).join('')}</ol>
+    <button class="recall-toggle" id="recallBtn">🙈 hide steps — test recall</button>`;
+  main.appendChild(stepsCard);
+  $('#recallBtn').onclick = ()=>{
+    const ol = $('#stepsList');
+    ol.classList.toggle('hidden');
+    $('#recallBtn').textContent = ol.classList.contains('hidden') ? '👁️ reveal steps' : '🙈 hide steps — test recall';
+  };
+
+  const trapCard = document.createElement('div');
+  trapCard.className='trap';
+  trapCard.innerHTML = t.trap;
+  main.appendChild(trapCard);
+
+  const drillCard = document.createElement('div');
+  drillCard.className='card drill-box';
+  drillCard.style.marginTop='12px';
+  drillCard.innerHTML = `<h2>Concept check</h2><div id="drillArea"></div>`;
+  main.appendChild(drillCard);
+
+  if(t.gen){ const gc=document.createElement('div'); gc.className='card'; gc.innerHTML='<h2>Calculation drill</h2><div id="genArea"></div>'; main.appendChild(gc); renderGen(t); }
+  renderMCQ(t);
+}
+
+/* ---------- MCQ drill ---------- */
+function renderMCQ(t){
+  const pool = shuffle(t.mcq);
+  let idx = 0;
+  function show(){
+    const area = $('#drillArea');
+    if(idx>=pool.length){
+      area.innerHTML = `<p style="color:var(--good);font-size:13.5px;">Bank cleared. <button class="act primary" id="againBtn">Run it again</button></p>`;
+      $('#againBtn').onclick = ()=>{ idx=0; pool.length=0; pool.push(...shuffle(t.mcq)); show(); };
+      return;
+    }
+    const q = pool[idx];
+    const opts = q.opts.map((o,i)=>`<button class="opt" data-i="${i}">${o}</button>`).join('');
+    area.innerHTML = `<div class="progress-mini">question ${idx+1} / ${pool.length}</div>
+      <div class="mcq-q">${q.q}</div>${opts}
+      <div class="explain" id="exp">${q.e}</div>
+      <div class="btnrow"><button class="act primary" id="nextQ" style="display:none;">Next →</button></div>`;
+    $$('.opt',area).forEach(btn=>{
+      btn.onclick = ()=>{
+        if(btn.disabled) return;
+        $$('.opt',area).forEach(b=>b.disabled=true);
+        const i = +btn.dataset.i;
+        const correct = i===q.a;
+        btn.classList.add(correct?'correct':'wrong');
+        if(!correct){ $$('.opt',area)[q.a].classList.add('correct'); }
+        $('#exp').classList.add('show');
+        $('#nextQ').style.display='inline-block';
+        grade(correct);
+      };
+    });
+    $('#nextQ').onclick = ()=>{ idx++; show(); };
+  }
+  show();
+}
+
+
+renderNav();renderTopic();
+</script></body></html>
